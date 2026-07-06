@@ -282,6 +282,71 @@
             box-shadow: 0 0 0 2px var(--primary-light);
         }
 
+        /* Estilos do Componente Customizado Dropdown Multiselect */
+        .dropdown-multiselect-container {
+            position: relative;
+        }
+        .multiselect-trigger {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            user-select: none;
+        }
+        .multiselect-options-panel {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 220px;
+            overflow-y: auto;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+            padding: 6px;
+        }
+        .multiselect-option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-primary);
+            transition: background 0.15s;
+        }
+        .multiselect-option-item:hover {
+            background-color: var(--primary-light);
+        }
+        body.dark-mode .multiselect-option-item:hover {
+            background-color: rgba(56, 189, 248, 0.2);
+        }
+        .multiselect-option-item input[type="checkbox"] {
+            cursor: pointer;
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+        .multiselect-option-item label {
+            text-transform: none !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            color: inherit !important;
+            margin: 0 !important;
+            cursor: pointer;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         /* Menu de Navegação por Abas */
         .nav-tabs {
             display: flex;
@@ -854,6 +919,15 @@
                 <label>UF</label>
                 <select id="filterUF" class="form-control"><option value="">Todos</option></select>
             </div>
+            <div class="form-group dropdown-multiselect-container" id="verticalContainer">
+                <label>Vertical</label>
+                <div class="form-control multiselect-trigger" id="verticalDropdownTrigger">
+                    <span id="verticalDropdownText">Todos</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 10px; opacity: 0.6;"></i>
+                </div>
+                <div class="multiselect-options-panel" id="verticalOptionsPanel">
+                </div>
+            </div>
             <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px; justify-content: flex-start; min-height: 38px; padding-top: 14px;">
                 <input type="checkbox" id="filterWithResponsible" style="width: 16px; height: 16px; cursor: pointer;">
                 <label for="filterWithResponsible" style="cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin: 0; white-space: nowrap;">C/ resp.</label>
@@ -972,7 +1046,7 @@
             responsavel: ['responsável', 'responsavel', 'tecnico', 'técnico', 'analista', 'owner', 'assigned', 'atribuído a', 'operador'],
             prioridade: ['prioridade', 'criticidade', 'priority', 'urgência', 'escala'],
             status: ['status', 'situação', 'situacao', 'estado', 'fase', 'estágio', 'status atual'],
-            tipo: ['tipo', 'categoria', 'type', 'subcategoria', 'grupo'],
+            vertical: ['vertical', 'segmento', 'setor', 'área', 'area', 'business unit', 'bu'],
             produto: ['produto', 'sistema', 'product', 'aplicação', 'módulo'],
             uf: ['uf', 'estado', 'regiao', 'região', 'unidade federativa'],
             data_abertura: ['criado', 'data_abertura', 'abertura', 'data de abertura', 'criado em', 'data', 'created_at', 'data de criação', 'data/hora'],
@@ -1097,11 +1171,10 @@
             document.getElementById('fileInput').addEventListener('change', handleFileUpload);
             document.getElementById('refreshBtn').addEventListener('click', applyFiltersAndRefresh);
 
-            // Filtro tipo removido do array de monitoramento
+            // Removido filterVertical do laço automatizado pois ele gerencia seu próprio evento change
             const filters = ['filterSearch', 'filterClient', 'filterResponsible', 'filterStatus', 'filterPriority', 'filterProduct', 'filterUF'];
             filters.forEach(id => document.getElementById(id).addEventListener('input', applyFiltersAndRefresh));
             
-            // Listener para o novo filtro de Responsável ativo
             document.getElementById('filterWithResponsible').addEventListener('change', applyFiltersAndRefresh);
 
             document.getElementById('pagLength').addEventListener('change', (e) => { rowsPerPage = parseInt(e.target.value); currentPage = 1; renderTable(); });
@@ -1119,6 +1192,21 @@
             document.getElementById('tab-btn-dashboard').addEventListener('click', () => switchTab('dashboard'));
             document.getElementById('tab-btn-table').addEventListener('click', () => switchTab('table'));
             document.getElementById('sidebarCloseBtn').addEventListener('click', closeSidebar);
+
+            // Gerenciamento de abertura/fechamento do dropdown multiselect customizado
+            const trigger = document.getElementById('verticalDropdownTrigger');
+            const panel = document.getElementById('verticalOptionsPanel');
+            if (trigger && panel) {
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+                });
+                document.addEventListener('click', (e) => {
+                    if (!panel.contains(e.target) && e.target !== trigger) {
+                        panel.style.display = 'none';
+                    }
+                });
+            }
         };
 
         function handleFileUpload(e) {
@@ -1204,8 +1292,10 @@
                 { id: 'filterStatus', key: 'status' }, { id: 'filterPriority', key: 'prioridade' },
                 { id: 'filterProduct', key: 'produto' }, { id: 'filterUF', key: 'uf' }
             ];
+            
             dropdownConfigs.forEach(conf => {
                 const selectElement = document.getElementById(conf.id);
+                if (!selectElement) return;
                 selectElement.innerHTML = '<option value="">Todos</option>';
                 let uniqueValues = new Set();
                 rawDataGlobal.forEach(row => {
@@ -1216,7 +1306,61 @@
                     let opt = document.createElement('option'); opt.value = val; opt.innerText = val; selectElement.appendChild(opt);
                 });
             });
+
+            // AJUSTE: População customizada do painel de multipla seleção para a Vertical
+            const verticalPanel = document.getElementById('verticalOptionsPanel');
+            if (verticalPanel) {
+                verticalPanel.innerHTML = '';
+                let uniqueValues = new Set();
+                rawDataGlobal.forEach(row => {
+                    let val = getMappedValue(row, 'vertical');
+                    if (val !== undefined && val !== null && val !== '') uniqueValues.add(val.toString().trim());
+                });
+                
+                Array.from(uniqueValues).sort().forEach(val => {
+                    let itemDiv = document.createElement('div');
+                    itemDiv.className = 'multiselect-option-item';
+                    itemDiv.innerHTML = `
+                        <input type="checkbox" value="${val}" id="cb-vert-${val}">
+                        <label for="cb-vert-${val}">${val}</label>
+                    `;
+                    
+                    // Listener para recalcular base e mudar texto se mudar a caixa de seleção
+                    itemDiv.querySelector('input').addEventListener('change', () => {
+                        updateVerticalTriggerText();
+                        applyFiltersAndRefresh();
+                    });
+                    
+                    // Facilita o clique na linha inteira
+                    itemDiv.addEventListener('click', (e) => {
+                        if (e.target.tagName !== 'INPUT') {
+                            const cb = itemDiv.querySelector('input');
+                            cb.checked = !cb.checked;
+                            cb.dispatchEvent(new Event('change'));
+                        }
+                    });
+                    
+                    verticalPanel.appendChild(itemDiv);
+                });
+                updateVerticalTriggerText();
+            }
         };
+
+        // AJUSTE: Atualiza o texto exibido no gatilho da selectbox baseado nos itens marcados
+        function updateVerticalTriggerText() {
+            const checkboxes = document.querySelectorAll('#verticalOptionsPanel input[type="checkbox"]');
+            const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+            const textEl = document.getElementById('verticalDropdownText');
+            if (!textEl) return;
+            
+            if (selected.length === 0) {
+                textEl.innerText = 'Todos';
+            } else if (selected.length === 1) {
+                textEl.innerText = selected[0];
+            } else {
+                textEl.innerText = `${selected.length} selecionados`;
+            }
+        }
 
         const applyFiltersAndRefresh = () => {
             const searchText = document.getElementById('filterSearch').value.toLowerCase().trim();
@@ -1227,9 +1371,12 @@
             const prodVal = document.getElementById('filterProduct').value;
             const ufVal = document.getElementById('filterUF').value;
             const withRespOnly = document.getElementById('filterWithResponsible').checked;
+            
+            // AJUSTE: Captura da lista de Verticais assinaladas
+            const checkboxes = document.querySelectorAll('#verticalOptionsPanel input[type="checkbox"]');
+            const selectedVerticals = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
 
             filteredDataGlobal = rawDataGlobal.filter(row => {
-                // AJUSTE: Remove da base global os chamados sem responsável quando o filtro "C/ resp." for ativado
                 if (withRespOnly && isSemResponsavel(getMappedValue(row, 'responsavel'))) return false;
 
                 if (searchText) {
@@ -1242,6 +1389,12 @@
                 if (prioVal && getMappedValue(row, 'prioridade').toString().trim() !== prioVal) return false;
                 if (prodVal && getMappedValue(row, 'produto').toString().trim() !== prodVal) return false;
                 if (ufVal && getMappedValue(row, 'uf').toString().trim() !== ufVal) return false;
+                
+                // AJUSTE: Filtragem baseada em correspondência de Array de Múltipla Escolha (Vazio = Todos)
+                if (selectedVerticals.length > 0) {
+                    let rVert = getMappedValue(row, 'vertical').toString().trim();
+                    if (!selectedVerticals.includes(rVert)) return false;
+                }
                 
                 return true;
             });
@@ -1295,7 +1448,6 @@
             const board = document.getElementById('kanbanBoard'); board.innerHTML = '';
             const withRespOnly = document.getElementById('filterWithResponsible').checked;
             
-            // AJUSTE: Remove a coluna Backlog da esteira alvo se o filtro "C/ resp." estiver ativo
             const targetColumns = withRespOnly 
                 ? ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"]
                 : ["Backlog", "To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
@@ -1494,7 +1646,7 @@
         const openSidebarDetails = (row) => {
             const container = document.getElementById('sidebarFieldsContainer'); container.innerHTML = '';
             const cats = [
-                { title: 'Informações Gerais do Chamado', fields: [{ label: 'Número do Chamado (Chave)', key: 'id' }, { label: 'Tipo de Migração', key: 'tipo' }, { label: 'Produto Vinculado', key: 'produto' }] },
+                { title: 'Informações Gerais do Chamado', fields: [{ label: 'Número do Chamado (Chave)', key: 'id' }, { label: 'Vertical / BU', key: 'vertical' }, { label: 'Produto Vinculado', key: 'produto' }] },
                 { title: 'Dados de Identificação Regional', fields: [{ label: 'Município', key: 'cliente' }, { label: 'UF / Região', key: 'uf' }] },
                 { title: 'Responsável Técnico', fields: [{ label: 'Profissional Atribuído', key: 'responsavel' }] },
                 { title: 'Prazos e Cronologia', fields: [{ label: 'Data de Abertura (Criado)', key: 'data_abertura' }, { label: 'Prazo Limite / SLA', key: 'prazo' }, { label: 'Dias Correntes em Aberto', key: 'dias_aberto' }] },
@@ -1545,7 +1697,7 @@
             const exportData = filteredDataGlobal.map(row => ({
                 'Chamado (Chave)': getMappedValue(row, 'id'), 'Município': getMappedValue(row, 'cliente'), 'Resumo': getMappedValue(row, 'resumo'),
                 'Responsável': getMappedValue(row, 'responsavel'), 'Prioridade': getMappedValue(row, 'prioridade'), 'Status': getMappedValue(row, 'status'),
-                'Tipo': getMappedValue(row, 'tipo'), 'Produto': getMappedValue(row, 'produto'), 'UF': getMappedValue(row, 'uf'),
+                'Vertical': getMappedValue(row, 'vertical'), 'Produto': getMappedValue(row, 'produto'), 'UF': getMappedValue(row, 'uf'),
                 'Data Abertura': getMappedValue(row, 'data_abertura') instanceof Date ? getMappedValue(row, 'data_abertura').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_abertura'),
                 'Dias Aberto': getMappedValue(row, 'dias_aberto'), 'Observações': getMappedValue(row, 'observacoes')
             }));
