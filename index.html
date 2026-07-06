@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Gerencial de Migração (15 dias) - Versão Homologada</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        /* Variáveis de Tema (Light Mode Padrão) */
+        :root {
+            --bg-app: #f4f5f7;
+            --bg-card: #ffffff;
+            --bg-sidebar: #ffffff;
+            --text-primary: #172b4d;
+            --text-secondary: #5e6c84;
+            --border-color: #dfe1e6;
+            --primary: #0052cc;
+            --primary-hover: #0065ff;
+            --primary-light: #deebff;
+            --success: #36b37e;
+            --success-light: #e3fcef;
+            --warning: #ffab00;
+            --warning-light: #fffae6;
+            --danger: #ff5630;
+            --danger-light: #ffebe6;
+            --info: #00b8d9;
+            --info-light: #e6fcff;
+            --shadow-sm:0 1px 3px rgba(9,30,66,0.13), 0 0 1px rgba(9,30,66,0.2);
+            --shadow-md: 0 4px 8px -2px rgba(9,30,66,0.25), 0 0 1px rgba(9,30,66,0.31);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --kanban-column-bg: #ebecf0;
+        }
+
+        /* Variáveis Dark Mode */
+        body.dark-mode {
+            --bg-app: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --primary: #38bdf8;
+            --primary-hover: #7dd3fc;
+            --primary-light: rgba(56, 189, 248, 0.15);
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.15);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.15);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.15);
+            --info: #06b6d4;
+            --info-light: rgba(6, 182, 212, 0.15);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --kanban-column-bg: #151f32;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-app);
+            color: var(--text-primary);
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Cabeçalho */
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+            transition: var(--transition);
+        }
+
+        .header-title-area h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title-area p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Botões */
+        .btn {
+            background-color: var(--bg-app);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background-color: var(--border-color);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-toggle-dark {
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            justify-content: center;
+        }
+
+        /* Layout Geral */
+        .container {
+            padding: 20px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Grid de Indicadores */
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .indicator-card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .indicator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--primary);
+        }
+
+        .indicator-card.open::before { background-color: var(--info); }
+        .indicator-card.completed::before { background-color: var(--success); }
+        .indicator-card.delayed::before { background-color: var(--danger); }
+        .indicator-card.warning::before { background-color: var(--warning); }
+
+        .indicator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .indicator-icon {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+        .indicator-card.open .indicator-icon { color: var(--info); }
+        .indicator-card.completed .indicator-icon { color: var(--success); }
+        .indicator-card.delayed .indicator-icon { color: var(--danger); }
+
+        .indicator-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 10px;
+        }
+
+        /* Barra de Filtros */
+        .filter-bar {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+
+        .filter-bar .search-group {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 1100px) {
+            .filter-bar .search-group { grid-column: span 1; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            background-color: var(--bg-app);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+            font-size: 13px;
+            outline: none;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        /* Menu de Navegação por Abas */
+        .nav-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            gap: 8px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Visão Kanban */
+        .kanban-board {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            align-items: flex-start;
+            min-height: 500px;
+        }
+
+        .kanban-column {
+            background-color: var(--kanban-column-bg);
+            border-radius: var(--radius-md);
+            min-width: 290px;
+            max-width: 360px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-height: 75vh;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .kanban-column-header {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .kanban-column-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+        }
+
+        .kanban-card-count {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .kanban-cards {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .kanban-card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kanban-card.prio-alta { border-left-color: var(--danger); }
+        .kanban-card.prio-media { border-left-color: var(--warning); }
+        .kanban-card.prio-baixa { border-left-color: var(--success); }
+
+        .kanban-card.card-atrasado {
+            background-color: #ffebe6 !important;
+            border-right: 2px dashed var(--danger);
+        }
+        body.dark-mode .kanban-card.card-atrasado {
+            background-color: rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .card-id {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .card-id:hover {
+            text-decoration: underline !important;
+        }
+
+        .card-client {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            background: rgba(9, 30, 66, 0.06);
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            align-self: flex-start;
+            letter-spacing: 0.3px;
+        }
+
+        body.dark-mode .card-client {
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+        }
+
+        .card-summary {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 6px;
+        }
+
+        .card-responsible {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-days {
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .card-days.ok { background-color: var(--success-light); color: var(--success); }
+        .card-days.warn { background-color: var(--warning-light); color: var(--warning); }
+        .card-days.danger { background-color: var(--danger-light); color: var(--danger); }
+
+        /* Visão Gráficos */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        .chart-card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-height: 320px;
+        }
+
+        .chart-card h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            border-left: 4px solid var(--primary);
+            padding-left: 8px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Visão Tabela */
+        .table-card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-actions-bar {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--bg-app);
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border-color);
+            cursor: pointer;
+            user-select: none;
+            transition: var(--transition);
+        }
+
+        th:hover {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        th i {
+            margin-left: 4px;
+            font-size: 10px;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            white-space: nowrap;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        tr:hover td {
+            background-color: var(--primary-light);
+            cursor: pointer;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .badge-alta { background-color: var(--danger-light); color: var(--danger); }
+        .badge-media { background-color: var(--warning-light); color: var(--warning); }
+        .badge-baixa { background-color: var(--success-light); color: var(--success); }
+
+        .pagination-bar {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-app);
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        /* Painel Lateral Drawer */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.4);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-panel {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100vh;
+            background-color: var(--bg-sidebar);
+            box-shadow: -4px 0 15px rgba(0,0,0,0.15);
+            z-index: 101;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 500px) {
+            .sidebar-panel { width: 100vw; right: -100vw; }
+        }
+
+        .sidebar-overlay.active .sidebar-panel {
+            transform: translateX(-450px);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .sidebar-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-category {
+            background-color: var(--bg-app);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-category h3 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+
+        .detail-value.notes-block {
+            grid-column: span 2;
+            white-space: pre-wrap;
+            font-weight: 500;
+            background-color: var(--bg-card);
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 600px) {
+            .indicators-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #fileInput { display: none; }
+        
+        /* Ajuste sutil para links na tabela */
+        table td a:hover {
+            text-decoration: underline !important;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header>
+        <div class="header-title-area">
+            <h1><i class="fa-solid fa-chart-kanban" style="color: var(--primary);"></i> Dashboard Gerencial de Migração (15 dias)</h1>
+            <p>Última atualização: <span id="lastUpdate">-</span></p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-toggle-dark" id="darkModeBtn" title="Alternar Modo Escuro">
+                <i class="fa-solid fa-sun"></i>
+            </button>
+            <button class="btn" id="refreshBtn"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+            <label for="fileInput" class="btn btn-primary">
+                <i class="fa-solid fa-file-import"></i> Importar Planilha
+            </label>
+            <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <section class="indicators-grid">
+            <div class="indicator-card">
+                <div class="indicator-header">Total Chamados <i class="fa-solid fa-list-check indicator-icon"></i></div>
+                <div class="indicator-value" id="indTotal">0</div>
+            </div>
+            <div class="indicator-card open">
+                <div class="indicator-header">Em Aberto <i class="fa-solid fa-folder-open indicator-icon"></i></div>
+                <div class="indicator-value" id="indOpen">0</div>
+            </div>
+            <div class="indicator-card completed">
+                <div class="indicator-header">Concluídos <i class="fa-solid fa-circle-check indicator-icon"></i></div>
+                <div class="indicator-value" id="indCompleted">0</div>
+            </div>
+            <div class="indicator-card delayed">
+                <div class="indicator-header">Atrasados (>30d) <i class="fa-solid fa-clock-history indicator-icon"></i></div>
+                <div class="indicator-value" id="indDelayed">0</div>
+            </div>
+            <div class="indicator-card warning">
+                <div class="indicator-header">Municípios Ativos <i class="fa-solid fa-building indicator-icon"></i></div>
+                <div class="indicator-value" id="indClients">0</div>
+            </div>
+            <div class="indicator-card">
+                <div class="indicator-header">Responsáveis <i class="fa-solid fa-user-gear indicator-icon"></i></div>
+                <div class="indicator-value" id="indStaff">0</div>
+            </div>
+            <div class="indicator-card warning">
+                <div class="indicator-header">T. Médio em Aberto <i class="fa-solid fa-hourglass-half indicator-icon"></i></div>
+                <div class="indicator-value" id="indAvgTime">0d</div>
+            </div>
+            <div class="indicator-card completed">
+                <div class="indicator-header">% Concluído <i class="fa-solid fa-percent indicator-icon"></i></div>
+                <div class="indicator-value" id="indPercent">0%</div>
+            </div>
+        </section>
+
+        <section class="filter-bar">
+            <div class="form-group search-group">
+                <label>Pesquisa por Texto</label>
+                <input type="text" id="filterSearch" class="form-control" placeholder="Buscar por chamado, resumo, notas...">
+            </div>
+            <div class="form-group">
+                <label>Município</label>
+                <select id="filterClient" class="form-control"><option value="">Todos</option></select>
+            </div>
+            <div class="form-group">
+                <label>Responsável</label>
+                <select id="filterResponsible" class="form-control"><option value="">Todos</option></select>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="filterStatus" class="form-control"><option value="">Todos</option></select>
+            </div>
+            <div class="form-group">
+                <label>Prioridade</label>
+                <select id="filterPriority" class="form-control"><option value="">Todos</option></select>
+            </div>
+            <div class="form-group">
+                <label>Tipo</label>
+                <select id="filterType" class="form-control"><option value="">Todos</option></select>
+            </div>
+            <div class="form-group">
+                <label>Produto</label>
+                <select id="filterProduct" class="form-control"><option value="">Todos</option></select>
+            </div>
+            <div class="form-group">
+                <label>UF</label>
+                <select id="filterUF" class="form-control"><option value="">Todos</option></select>
+            </div>
+        </section>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" id="tab-btn-kanban"><i class="fa-solid fa-table-columns"></i> Kanban</button>
+            <button class="tab-btn" id="tab-btn-dashboard"><i class="fa-solid fa-chart-pie"></i> Gráficos</button>
+            <button class="tab-btn" id="tab-btn-table"><i class="fa-solid fa-table"></i> Tabela de Dados</button>
+        </nav>
+
+        <div id="tab-kanban" class="tab-content active">
+            <div class="kanban-board" id="kanbanBoard">
+                </div>
+        </div>
+
+        <div id="tab-dashboard" class="tab-content">
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Chamados por Status</h3>
+                    <div class="chart-wrapper"><canvas id="chartStatus"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Chamados por Responsável</h3>
+                    <div class="chart-wrapper"><canvas id="chartResponsible"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Top 10 Municípios</h3>
+                    <div class="chart-wrapper"><canvas id="chartClient"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Chamados por Produto</h3>
+                    <div class="chart-wrapper"><canvas id="chartProduct"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Evolução por Data</h3>
+                    <div class="chart-wrapper"><canvas id="chartDate"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Chamados por Prioridade</h3>
+                    <div class="chart-wrapper"><canvas id="chartPriority"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Tempo Médio em Aberto por Responsável (Dias)</h3>
+                    <div class="chart-wrapper"><canvas id="chartAvgTimeResp"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-table" class="tab-content">
+            <div class="table-card">
+                <div class="table-actions-bar">
+                    <div style="font-weight: 600; font-size: 14px;">Registros Filtrados: <span id="tableCount">0</span></div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn" onclick="exportTable('copy')"><i class="fa-solid fa-copy"></i> Copiar Dados</button>
+                        <button class="btn" onclick="exportTable('csv')"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
+                        <button class="btn" onclick="exportTable('excel')"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="dataTableMain">
+                        <thead>
+                            <tr id="tableHeaderRow">
+                                </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="pagination-bar">
+                    <div>
+                        Exibindo de <span id="pagStart">0</span> a <span id="pagEnd">0</span> de <span id="pagTotal">0</span> registros.
+                        <select id="pagLength" class="form-control" style="width: auto; display: inline-block; margin-left: 10px; padding: 4px 8px;">
+                            <option value="10">10 por página</option>
+                            <option value="25" selected>25 por página</option>
+                            <option value="50">50 por página</option>
+                            <option value="100">100 por página</option>
+                        </select>
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="btn" id="btnPrevPage" style="padding: 4px 10px;"><i class="fa-solid fa-chevron-left"></i> Anteriores</button>
+                        <button class="btn" id="btnNextPage" style="padding: 4px 10px;">Próximas <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay">
+        <div class="sidebar-panel">
+            <div class="sidebar-header">
+                <h2>Detalhes Completos do Chamado</h2>
+                <button class="sidebar-close" id="sidebarCloseBtn">&times;</button>
+            </div>
+            <div class="sidebar-content" id="sidebarFieldsContainer">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        let rawDataGlobal = [];
+        let filteredDataGlobal = [];
+        let chartInstances = {};
+        
+        let currentPage = 1;
+        let rowsPerPage = 25;
+        let currentSortColumn = '';
+        let currentSortDirection = 'asc';
+
+        const fieldMapping = {
+            id: ['chave', 'key', 'chamado', 'id', 'ticket', 'numero', 'número', 'codigo', 'código', 'id do chamado', 'incident', 'nº'],
+            cliente: ['município', 'municipio', 'cidade', 'localidade', 'cliente', 'empresa', 'razão social', 'razao_social', 'client', 'nome do cliente', 'solicitante'],
+            resumo: ['resumo', 'assunto', 'descrição', 'descricao', 'titulo', 'título', 'summary', 'descrição curta', 'breve descrição'],
+            responsavel: ['responsável', 'responsavel', 'tecnico', 'técnico', 'analista', 'owner', 'assigned', 'atribuído a', 'operador'],
+            prioridade: ['prioridade', 'criticidade', 'priority', 'urgência', 'escala'],
+            status: ['status', 'situação', 'situacao', 'estado', 'fase', 'estágio', 'status atual'],
+            tipo: ['tipo', 'categoria', 'type', 'subcategoria', 'grupo'],
+            produto: ['produto', 'sistema', 'product', 'aplicação', 'módulo'],
+            uf: ['uf', 'estado', 'regiao', 'região', 'unidade federativa'],
+            data_abertura: ['criado', 'data_abertura', 'abertura', 'data de abertura', 'criado em', 'data', 'created_at', 'data de criação', 'data/hora'],
+            prazo: ['prazo', 'data limite', 'vencimento', 'sla', 'deadline', 'vence em', 'limite'],
+            dias_aberto: ['dias em aberto', 'dias_aberto', 'dias', 'tempo em aberto', 'age', 'dias decorridos', 'atraso'],
+            observacoes: ['observações', 'observacoes', 'notas', 'comentários', 'comentarios', 'descrição detalhada', 'histórico', 'detalhes']
+        };
+
+        const isStatusConcluido = (statusStr) => {
+            const s = (statusStr || '').toString().toLowerCase().trim();
+            return s === 'concluído' || s === 'concluido' || s === 'finalizado' || s === 'fechado' || s === 'encerrado';
+        };
+
+        const getStatusStyle = (statusStr) => {
+            const s = (statusStr || '').toString().toLowerCase().trim();
+            
+            if (s === 'fechado' || s === 'concluído' || s === 'concluido') {
+                return { bg: 'var(--success-light)', text: 'var(--success)', border: 'var(--success)' };
+            }
+            if (s === 'aguardando solicitante' || s === 'aguardando informações (planejamento)' || s === 'aguardando informacoes (planejamento)' || s === 'aguardando dependência' || s === 'aguardando dependencia' || s === 'produto' || s === 'aguardando revenda') {
+                return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
+            }
+            if (s === 'aguardando planejamento' || s === 'em planejamento' || s === 'aguardando atendimento (fl)' || s === 'aguardando atendimento' || s === 'não iniciada' || s === 'nao iniciada') {
+                return { bg: 'var(--kanban-column-bg)', text: 'var(--text-secondary)', border: 'var(--text-secondary)' };
+            }
+            if (s === 'em atendimento' || s === 'em atendimento (fl)' || s === 'em atendimento n2 (sup)' || s === 'em atendimento n2') {
+                return { bg: 'var(--warning-light)', text: 'var(--warning)', border: 'var(--warning)' };
+            }
+
+            return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
+        };
+
+        const parseSafeDate = (val) => {
+            if (!val) return new Date(0);
+            if (val instanceof Date) return val;
+            let str = val.toString().trim().toLowerCase();
+            
+            if (str.includes('/')) {
+                let p = str.split('/');
+                if (p.length >= 3) {
+                    let day = parseInt(p[0].trim(), 10);
+                    
+                    let monthStr = p[1].trim();
+                    let month = parseInt(monthStr, 10) - 1;
+                    if (isNaN(month)) {
+                        const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                        month = months.findIndex(m => monthStr.startsWith(m));
+                    }
+                    
+                    let yearStr = p[2].trim().split(/\s+/)[0];
+                    let year = parseInt(yearStr, 10);
+                    if (!isNaN(year) && year < 100) {
+                        year += 2000;
+                    }
+                    
+                    if (!isNaN(day) && !isNaN(month) && month >= 0 && !isNaN(year)) {
+                        return new Date(year, month, day);
+                    }
+                }
+            }
+            if (str.includes('-')) return new Date(str);
+            let n = parseFloat(str);
+            if (!isNaN(n) && n > 20000) return new Date((n - 25569) * 86400 * 1000);
+            let parsed = new Date(str);
+            return isNaN(parsed.getTime()) ? new Date(0) : parsed;
+        };
+
+        const getMappedValue = (row, fieldKey) => {
+            if (!row) return '';
+            
+            if (fieldKey === 'dias_aberto') {
+                const aliasesData = fieldMapping['data_abertura'];
+                const rowKeys = Object.keys(row);
+                let dateVal = '';
+                for (let alias of aliasesData) {
+                    let match = rowKeys.find(k => k.toLowerCase().trim() === alias.toLowerCase().trim());
+                    if (match) { dateVal = row[match]; break; }
+                }
+                if (!dateVal) {
+                    for (let alias of aliasesData) {
+                        let match = rowKeys.find(k => k.toLowerCase().includes(alias.toLowerCase()));
+                        if (match) { dateVal = row[match]; break; }
+                    }
+                }
+                if (dateVal) {
+                    const openDate = parseSafeDate(dateVal);
+                    if (openDate && openDate.getTime() !== 0 && !isNaN(openDate.getTime())) {
+                        const today = new Date();
+                        const d1 = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+                        const d2 = Date.UTC(openDate.getFullYear(), openDate.getMonth(), openDate.getDate());
+                        const diffDays = Math.floor((d1 - d2) / (1000 * 60 * 60 * 24));
+                        return diffDays < 0 ? 0 : diffDays;
+                    }
+                }
+            }
+
+            const aliases = fieldMapping[fieldKey];
+            if (!aliases) return '';
+            const rowKeys = Object.keys(row);
+            for (let alias of aliases) {
+                let match = rowKeys.find(k => k.toLowerCase().trim() === alias.toLowerCase().trim());
+                if (match) return row[match];
+            }
+            for (let alias of aliases) {
+                let match = rowKeys.find(k => k.toLowerCase().includes(alias.toLowerCase()));
+                if (match) return row[match];
+            }
+            return '';
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            loadDataset([]); 
+        });
+
+        const setupEventListeners = () => {
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+            document.getElementById('refreshBtn').addEventListener('click', applyFiltersAndRefresh);
+
+            const filters = ['filterSearch', 'filterClient', 'filterResponsible', 'filterStatus', 'filterPriority', 'filterType', 'filterProduct', 'filterUF'];
+            filters.forEach(id => document.getElementById(id).addEventListener('input', applyFiltersAndRefresh));
+
+            document.getElementById('pagLength').addEventListener('change', (e) => { rowsPerPage = parseInt(e.target.value); currentPage = 1; renderTable(); });
+            document.getElementById('btnPrevPage').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
+            document.getElementById('btnNextPage').addEventListener('click', () => { if (currentPage < Math.ceil(filteredDataGlobal.length / rowsPerPage)) { currentPage++; renderTable(); } });
+
+            document.getElementById('darkModeBtn').addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                document.getElementById('darkModeBtn').innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+                renderCharts();
+            });
+
+            document.getElementById('tab-btn-kanban').addEventListener('click', () => switchTab('kanban'));
+            document.getElementById('tab-btn-dashboard').addEventListener('click', () => switchTab('dashboard'));
+            document.getElementById('tab-btn-table').addEventListener('click', () => switchTab('table'));
+            document.getElementById('sidebarCloseBtn').addEventListener('click', closeSidebar);
+        };
+
+        function handleFileUpload(e) {
+            try {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+                const file = files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(evt) {
+                    try {
+                        const data = new Uint8Array(evt.target.result);
+                        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                        
+                        let finalJsonDataset = [];
+                        let maxRecordCount = 0;
+                        let detectedSheetName = "";
+
+                        workbook.SheetNames.forEach(sheetName => {
+                            const worksheet = workbook.Sheets[sheetName];
+                            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                            if (rows.length === 0) return;
+
+                            let bestHeaderRowIdx = 0;
+                            let maxColumnMatches = 0;
+
+                            for (let i = 0; i < Math.min(rows.length, 25); i++) {
+                                let currentMatches = 0;
+                                let rowCells = rows[i].map(c => (c || '').toString().toLowerCase().trim());
+                                
+                                Object.values(fieldMapping).forEach(aliases => {
+                                    if (aliases.some(alias => rowCells.some(cell => cell === alias.toLowerCase() || cell.includes(alias.toLowerCase())))) {
+                                        currentMatches++;
+                                    }
+                                });
+
+                                if (currentMatches > maxColumnMatches) {
+                                    maxColumnMatches = currentMatches;
+                                    bestHeaderRowIdx = i;
+                                }
+                            }
+
+                            let currentSheetJson = [];
+                            if (maxColumnMatches >= 2) {
+                                const trueHeaders = rows[bestHeaderRowIdx].map(h => (h || '').toString().trim());
+                                for (let j = bestHeaderRowIdx + 1; j < rows.length; j++) {
+                                    if (!rows[j] || rows[j].join('').trim() === "") continue;
+                                    
+                                    let rowObject = {};
+                                    trueHeaders.forEach((header, cellIdx) => {
+                                        if (header) {
+                                            rowObject[header] = rows[j][cellIdx] !== undefined ? rows[j][cellIdx] : "";
+                                        }
+                                    });
+                                    currentSheetJson.push(rowObject);
+                                }
+                            } else {
+                                currentSheetJson = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                            }
+
+                            if (currentSheetJson.length > maxRecordCount) {maxRecordCount = currentSheetJson.length; finalJsonDataset = currentSheetJson; detectedSheetName = sheetName;}
+                        });
+
+                        if (finalJsonDataset.length === 0) throw new Error("Estrutura inválida.");
+                        loadDataset(finalJsonDataset);
+                        document.getElementById('lastUpdate').innerText = new Date().toLocaleString('pt-BR');
+                        alert(`Sucesso! Foram processados ${finalJsonDataset.length} chamados da aba '${detectedSheetName}'.`);
+                    } catch (innerErr) {
+                        alert(`Erro na análise: ${innerErr.message}`);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } catch (err) {
+                alert(`Falha física: ${err.message}`);
+            }
+        }
+
+        const loadDataset = (data) => { rawDataGlobal = data; populateFilterDropdowns(); applyFiltersAndRefresh(); };
+
+        const populateFilterDropdowns = () => {
+            const dropdownConfigs = [
+                { id: 'filterClient', key: 'cliente' }, { id: 'filterResponsible', key: 'responsavel' },
+                { id: 'filterStatus', key: 'status' }, { id: 'filterPriority', key: 'prioridade' },
+                { id: 'filterType', key: 'tipo' }, { id: 'filterProduct', key: 'produto' }, { id: 'filterUF', key: 'uf' }
+            ];
+            dropdownConfigs.forEach(conf => {
+                const selectElement = document.getElementById(conf.id);
+                selectElement.innerHTML = '<option value="">Todos</option>';
+                let uniqueValues = new Set();
+                rawDataGlobal.forEach(row => {
+                    let val = getMappedValue(row, conf.key);
+                    if (val !== undefined && val !== null && val !== '') uniqueValues.add(val.toString().trim());
+                });
+                Array.from(uniqueValues).sort().forEach(val => {
+                    let opt = document.createElement('option'); opt.value = val; opt.innerText = val; selectElement.appendChild(opt);
+                });
+            });
+        };
+
+        const applyFiltersAndRefresh = () => {
+            const searchText = document.getElementById('filterSearch').value.toLowerCase().trim();
+            const clientVal = document.getElementById('filterClient').value;
+            const respVal = document.getElementById('filterResponsible').value;
+            const statusVal = document.getElementById('filterStatus').value;
+            const prioVal = document.getElementById('filterPriority').value;
+            const typeVal = document.getElementById('filterType').value;
+            const prodVal = document.getElementById('filterProduct').value;
+            const ufVal = document.getElementById('filterUF').value;
+
+            filteredDataGlobal = rawDataGlobal.filter(row => {
+                if (searchText) {
+                    let matchText = Object.values(row).some(v => v && v.toString().toLowerCase().includes(searchText));
+                    if (!matchText) return false;
+                }
+                if (clientVal && getMappedValue(row, 'cliente').toString().trim() !== clientVal) return false;
+                if (respVal && getMappedValue(row, 'responsavel').toString().trim() !== respVal) return false;
+                if (statusVal && getMappedValue(row, 'status').toString().trim() !== statusVal) return false;
+                if (prioVal && getMappedValue(row, 'prioridade').toString().trim() !== prioVal) return false;
+                if (typeVal && getMappedValue(row, 'tipo').toString().trim() !== typeVal) return false;
+                if (prodVal && getMappedValue(row, 'produto').toString().trim() !== prodVal) return false;
+                if (ufVal && getMappedValue(row, 'uf').toString().trim() !== ufVal) return false;
+                
+                return true;
+            });
+
+            currentPage = 1; calculateIndicators(); renderKanban();
+            if (document.getElementById('tab-dashboard').classList.contains('active')) renderCharts();
+            renderTableStructure(); renderTable();
+        };
+
+        const calculateIndicators = () => {
+            const total = filteredDataGlobal.length;
+            let emAberto = 0, concluidos = 0, atrasados = 0, totalDaysOpen = 0, countOpenForAvg = 0;
+            let uniqueClients = new Set(), uniqueStaff = new Set();
+
+            filteredDataGlobal.forEach(row => {
+                const status = (getMappedValue(row, 'status') || '').toString().trim();
+                const dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
+                if (getMappedValue(row, 'cliente')) uniqueClients.add(getMappedValue(row, 'cliente').toString().trim());
+                if (getMappedValue(row, 'responsavel')) uniqueStaff.add(getMappedValue(row, 'responsavel').toString().trim());
+
+                if (isStatusConcluido(status)) {
+                    concluidos++;
+                } else {
+                    emAberto++; totalDaysOpen += dias; countOpenForAvg++;
+                    if (dias > 30) atrasados++;
+                }
+            });
+
+            animateValue('indTotal', total); animateValue('indOpen', emAberto);
+            animateValue('indCompleted', concluidos); animateValue('indDelayed', atrasados);
+            animateValue('indClients', uniqueClients.size); animateValue('indStaff', uniqueStaff.size);
+            document.getElementById('indAvgTime').innerText = `${countOpenForAvg > 0 ? Math.round(totalDaysOpen / countOpenForAvg) : 0}d`;
+            document.getElementById('indPercent').innerText = `${total > 0 ? Math.round((concluidos / total) * 100) : 0}%`;
+        };
+
+        function animateValue(id, endValue) {
+            const obj = document.getElementById(id); if (!obj) return;
+            let startValue = 0, duration = 150;
+            if (endValue === 0) { obj.innerText = 0; return; }
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerText = Math.floor(progress * (endValue - startValue) + startValue);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        const renderKanban = () => {
+            const board = document.getElementById('kanbanBoard'); board.innerHTML = '';
+            
+            const targetColumns = ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
+            
+            const getColumnForStatus = (statusStr) => {
+                const s = (statusStr || '').toString().trim().toLowerCase();
+                
+                if (['não iniciada', 'nao iniciada', 'aguardando planejamento', 'em planejamento', 'aguardando atendimento (fl)', 'aguardando atendimento'].includes(s)) {
+                    return 'To do';
+                }
+                if (['em atendimento (fl)', 'em atendimento', 'em atendimento n2 (sup)', 'em atendimento n2'].includes(s)) {
+                    return 'Doing';
+                }
+                if (['fechado', 'concluído', 'concluido', 'finalizado', 'encerrado'].includes(s)) {
+                    return 'Done';
+                }
+                if (['aguardando informações (planejamento)', 'aguardando informacoes (planejamento)', 'aguardando solicitante', 'aguardando revenda'].includes(s)) {
+                    return 'Aguardando solicitante';
+                }
+                if (['produto', 'aguardando dependência', 'aguardando dependencia'].includes(s)) {
+                    return 'Aguardando dependência';
+                }
+                return 'To do'; 
+            };
+
+            const getColumnStyle = (colName) => {
+                if (colName === 'Done') return { bg: 'var(--success-light)', text: 'var(--success)', border: 'var(--success)' };
+                if (colName === 'Aguardando solicitante') return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
+                if (colName === 'To do') return { bg: 'var(--kanban-column-bg)', text: 'var(--text-secondary)', border: 'var(--text-secondary)' };
+                if (colName === 'Doing') return { bg: 'var(--warning-light)', text: 'var(--warning)', border: 'var(--warning)' };
+                if (colName === 'Aguardando dependência') return { bg: 'var(--danger-light)', text: 'var(--danger)', border: 'var(--danger)' };
+                return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
+            };
+
+            const prioWeight = { 'alta': 3, 'média': 2, 'media': 2, 'baixa': 1 };
+
+            targetColumns.forEach(colName => {
+                let colCardsData = filteredDataGlobal.filter(row => {
+                    const s = getMappedValue(row, 'status');
+                    return getColumnForStatus(s) === colName;
+                });
+                
+                colCardsData.sort((a,b) => (prioWeight[(getMappedValue(b,'prioridade')||'').toString().toLowerCase()]||0) - (prioWeight[(getMappedValue(a,'prioridade')||'').toString().toLowerCase()]||0));
+
+                const style = getColumnStyle(colName);
+
+                const colElement = document.createElement('div');
+                colElement.className = 'kanban-column';
+                colElement.innerHTML = `
+                    <div class="kanban-column-header" style="border-top: 4px solid ${style.border};">
+                        <span class="kanban-column-title">${colName}</span>
+                        <span class="kanban-card-count" style="background-color: ${style.bg}; color: ${style.text};">${colCardsData.length}</span>
+                    </div>
+                    <div class="kanban-cards"></div>
+                `;
+                board.appendChild(colElement);
+                const cardsContainer = colElement.querySelector('.kanban-cards');
+
+                colCardsData.forEach(row => {
+                    const id = getMappedValue(row, 'id') || '#ID';
+                    const municipio = getMappedValue(row, 'cliente') || 'Não Informado';
+                    const resumo = getMappedValue(row, 'resumo') || 'Sem resumo.';
+                    const responsavel = getMappedValue(row, 'responsavel') || 'Não Atribuído';
+                    const prioridade = (getMappedValue(row, 'prioridade') || 'Baixa').toString().trim();
+                    const dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
+                    let rD = getMappedValue(row, 'data_abertura');
+                    let dOpen = rD instanceof Date ? rD.toLocaleDateString('pt-BR') : (rD || '-');
+
+                    let prioClass = prioridade.toLowerCase() === 'alta' ? 'prio-alta' : (prioridade.toLowerCase().includes('med') ? 'prio-media' : 'prio-baixa');
+                    let isAtrasado = (colName !== 'Done' && dias > 30);
+
+                    // AJUSTE: Criação do Hiperlink para os IDs nos Cards do Kanban
+                    const idHtml = id !== '#ID' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" class="card-id" style="text-decoration: none; color: var(--primary);" onclick="event.stopPropagation();">${id}</a>` : `<span>${id}</span>`;
+
+                    const cardElement = document.createElement('div');
+                    cardElement.className = `kanban-card ${prioClass} ${isAtrasado ? 'card-atrasado' : ''}`;
+                    cardElement.innerHTML = `
+                        <div class="card-header-row">${idHtml}<span>${dOpen}</span></div>
+                        <div class="card-client"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:4px; opacity:0.6;"></i>${municipio}</div>
+                        <div class="card-summary">${resumo.substring(0, 75)}${resumo.length > 75 ? '...' : ''}</div>
+                        <div class="card-footer-row"><span class="card-responsible"><i class="fa-regular fa-user"></i> ${responsavel || '<em>Sem resp.</em>'}</span><span class="card-days ${dias>30?'danger':(dias>15?'warn':'ok')}">${dias}d</span></div>
+                    `;
+                    cardElement.addEventListener('click', () => openSidebarDetails(row));
+                    cardsContainer.appendChild(cardElement);
+                });
+            });
+        };
+
+        const renderCharts = () => {
+            Object.values(chartInstances).forEach(c => { if(c) c.destroy(); });
+            const isDark = document.body.classList.contains('dark-mode');
+            const txtColor = isDark ? '#94a3b8' : '#5e6c84', gridColor = isDark ? '#334155' : '#dfe1e6';
+            const palette = ['rgba(0,82,204,0.75)', 'rgba(54,179,126,0.75)', 'rgba(255,171,0,0.75)', 'rgba(255,86,48,0.75)', 'rgba(101,84,192,0.75)', 'rgba(0,184,217,0.75)'];
+
+            const optFactory = (indexAxis='x') => ({
+                responsive:true, maintainAspectRatio:false, indexAxis:indexAxis,
+                plugins:{ legend:{ display:false } },
+                scales:{ x:{ ticks:{ color:txtColor }, grid:{ color:gridColor } }, y:{ ticks:{ color:txtColor }, grid:{ color:gridColor }, beginAtZero:true } }
+            });
+
+            let stC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'status') || 'Não Informado'; stC[v] = (stC[v]||0)+1; });
+            chartInstances['status'] = new Chart(document.getElementById('chartStatus'), { type:'bar', data:{ labels:Object.keys(stC), datasets:[{ data:Object.values(stC), backgroundColor:palette }] }, options:optFactory('x') });
+
+            let rsC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'responsavel') || 'Não Atribuído'; rsC[v] = (rsC[v]||0)+1; });
+            chartInstances['resp'] = new Chart(document.getElementById('chartResponsible'), { type:'bar', data:{ labels:Object.keys(rsC), datasets:[{ data:Object.values(rsC), backgroundColor:palette[0] }] }, options:optFactory('y') });
+
+            let clC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'cliente') || 'Não Informado'; clC[v] = (clC[v]||0)+1; });
+            let topCl = Object.entries(clC).sort((a,b)=>b[1]-a[1]).slice(0,10);
+            chartInstances['client'] = new Chart(document.getElementById('chartClient'), { type:'bar', data:{ labels:topCl.map(e=>e[0]), datasets:[{ data:topCl.map(e=>e[1]), backgroundColor:palette[4] }] }, options:optFactory('x') });
+
+            let prC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'produto') || 'Outros'; prC[v] = (prC[v]||0)+1; });
+            chartInstances['product'] = new Chart(document.getElementById('chartProduct'), { type:'doughnut', data:{ labels:Object.keys(prC), datasets:[{ data:Object.values(prC), backgroundColor:palette }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, position:'right', labels:{ color:txtColor } } } } });
+
+            let dtC = {}; filteredDataGlobal.forEach(r => { let raw = getMappedValue(r, 'data_abertura'); let k = raw instanceof Date ? raw.toLocaleDateString('pt-BR') : (raw || 'Sem Data').toString().trim(); dtC[k] = (dtC[k]||0)+1; });
+            let sDates = Object.keys(dtC).sort((a,b)=>parseSafeDate(a)-parseSafeDate(b));
+            chartInstances['date'] = new Chart(document.getElementById('chartDate'), { type:'line', data:{ labels:sDates, datasets:[{ data:sDates.map(k=>dtC[k]), borderColor:'rgba(0,184,217,1)', tension:0.2, fill:true, backgroundColor:'rgba(0,184,217,0.1)' }] }, options:optFactory('x') });
+
+            let pcC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'prioridade') || 'Baixa'; pcC[v] = (pcC[v]||0)+1; });
+            chartInstances['priority'] = new Chart(document.getElementById('chartPriority'), { type:'pie', data:{ labels:Object.keys(pcC), datasets:[{ data:Object.values(pcC), backgroundColor:['#ff5630','#ffab00','#36b37e'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, position:'left', labels:{ color:txtColor } } } } });
+
+            let tmR = {}; filteredDataGlobal.forEach(r => {
+                let resp = getMappedValue(r, 'responsavel') || 'Não Atribuído';
+                let st = (getMappedValue(r, 'status') || '').toString().trim();
+                let dias = parseInt(getMappedValue(r, 'dias_aberto')) || 0;
+                if (!isStatusConcluido(st)) {
+                    if(!tmR[resp]) tmR[resp] = { t:0, c:0 }; tmR[resp].t += dias; tmR[resp].c++;
+                }
+            });
+            let labelsA = [], valuesA = []; Object.entries(tmR).forEach(([n,o])=>{ labelsA.push(n); valuesA.push(Math.round(o.t/o.c)||0); });
+            chartInstances['avgTimeResp'] = new Chart(document.getElementById('chartAvgTimeResp'), { type:'bar', data:{ labels:labelsA, datasets:[{ data:valuesA, backgroundColor:'rgba(255,137,0,0.75)' }] }, options:optFactory('x') });
+        };
+
+        const renderTableStructure = () => {
+            const row = document.getElementById('tableHeaderRow'); if(!row) return; row.innerHTML = '';
+            const cols = [{key:'id', label:'Chamado'}, {key:'cliente', label:'Município'}, {key:'resumo', label:'Resumo / Assunto'}, {key:'responsavel', label:'Responsável'}, {key:'prioridade', label:'Prioridade'}, {key:'status', label:'Status'}, {key:'dias_aberto', label:'Dias'}, {key:'data_abertura', label:'Abertura'}];
+            cols.forEach(c => {
+                let th = document.createElement('th'); th.innerText = c.label;
+                th.innerHTML += currentSortColumn === c.key ? (currentSortDirection === 'asc'?' <i class="fa-solid fa-sort-up"></i>':' <i class="fa-solid fa-sort-down"></i>') : ' <i class="fa-solid fa-sort" style="opacity:0.2"></i>';
+                th.addEventListener('click', () => { currentSortDirection = (currentSortColumn === c.key && currentSortDirection === 'asc') ? 'desc' : 'asc'; currentSortColumn = c.key; sortTableData(c.key); renderTableStructure(); renderTable(); });
+                row.appendChild(th);
+            });
+        };
+
+        const sortTableData = (key) => {
+            filteredDataGlobal.sort((a, b) => {
+                let vA = getMappedValue(a, key), vB = getMappedValue(b, key);
+                if (key === 'dias_aberto') { vA = parseInt(vA)||0; vB = parseInt(vB)||0; }
+                else if (key === 'data_abertura') { vA = parseSafeDate(vA).getTime(); vB = parseSafeDate(vB).getTime(); }
+                else { vA = (vA||'').toString().toLowerCase(); vB = (vB||'').toString().toLowerCase(); }
+                return vA < vB ? (currentSortDirection==='asc'?-1:1) : (vA > vB ? (currentSortDirection==='asc'?1:-1) : 0);
+            });
+        };
+
+        const renderTable = () => {
+            const tbody = document.getElementById('tableBody'); if(!tbody) return; tbody.innerHTML = '';
+            const tot = filteredDataGlobal.length; document.getElementById('tableCount').innerText = tot; document.getElementById('pagTotal').innerText = tot;
+            if (tot === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">Nenhum registro localizado.</td></tr>'; return; }
+            
+            const tPages = Math.ceil(tot / rowsPerPage); if (currentPage > tPages) currentPage = tPages || 1;
+            const start = (currentPage - 1) * rowsPerPage, end = Math.min(start + rowsPerPage, tot);
+            document.getElementById('pagStart').innerText = start + 1; document.getElementById('pagEnd').innerText = end;
+            document.getElementById('btnPrevPage').disabled = currentPage === 1; document.getElementById('btnNextPage').disabled = currentPage === tPages;
+
+            filteredDataGlobal.slice(start, end).forEach(row => {
+                let tr = document.createElement('tr');
+                let id = getMappedValue(row, 'id') || '-';
+                let prio = (getMappedValue(row, 'prioridade') || 'Baixa').toString().trim();
+                let st = (getMappedValue(row, 'status') || 'Aberto').toString().trim();
+                let dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
+                let rD = getMappedValue(row, 'data_abertura'); let dOp = rD instanceof Date ? rD.toLocaleDateString('pt-BR') : (rD || '-');
+                
+                const style = getStatusStyle(st);
+
+                // AJUSTE: Criação do Hiperlink para a Coluna "Chamado" na Tabela de Dados
+                const idHtml = id !== '-' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" style="text-decoration: none; color: var(--primary); font-weight: 700;" onclick="event.stopPropagation();">${id}</a>` : '-';
+
+                tr.innerHTML = `
+                    <td style="font-weight:700;">${idHtml}</td>
+                    <td style="font-weight:600;"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:6px; opacity:0.4;"></i>${getMappedValue(row, 'cliente')||'-'}</td>
+                    <td title="${getMappedValue(row, 'resumo')}">${getMappedValue(row, 'resumo')||'-'}</td>
+                    <td>${getMappedValue(row, 'responsavel') || '<em>Não Atribuído</em>'}</td>
+                    <td><span class="badge badge-${prio.toLowerCase().replace('é','e')}">${prio}</span></td>
+                    <td><span class="badge" style="background-color:${style.bg}; color:${style.text}; border: 1px solid ${style.border};">${st}</span></td>
+                    <td style="font-weight:700; color: ${dias > 30 ? 'var(--danger)' : 'inherit'};">${dias}d</td>
+                    <td>${dOp}</td>
+                `;
+                tr.addEventListener('click', () => openSidebarDetails(row)); tbody.appendChild(tr);
+            });
+        };
+
+        const openSidebarDetails = (row) => {
+            const container = document.getElementById('sidebarFieldsContainer'); container.innerHTML = '';
+            const cats = [
+                { title: 'Informações Gerais do Chamado', fields: [{ label: 'Número do Chamado (Chave)', key: 'id' }, { label: 'Tipo de Migração', key: 'tipo' }, { label: 'Produto Vinculado', key: 'produto' }] },
+                { title: 'Dados de Identificação Regional', fields: [{ label: 'Município', key: 'cliente' }, { label: 'UF / Região', key: 'uf' }] },
+                { title: 'Responsável Técnico', fields: [{ label: 'Profissional Atribuído', key: 'responsavel' }] },
+                { title: 'Prazos e Cronologia', fields: [{ label: 'Data de Abertura (Criado)', key: 'data_abertura' }, { label: 'Prazo Limite / SLA', key: 'prazo' }, { label: 'Dias Correntes em Aberto', key: 'dias_aberto' }] },
+                { title: 'Situação Operacional', fields: [{ label: 'Status Atual', key: 'status' }, { label: 'Nível de Prioridade', key: 'prioridade' }] }
+            ];
+            cats.forEach(cat => {
+                let catDiv = document.createElement('div'); catDiv.className = 'detail-category';
+                let catHeader = document.createElement('h3'); catHeader.innerText = cat.title; catDiv.appendChild(catHeader);
+                let grid = document.createElement('div'); grid.className = 'detail-grid';
+                cat.fields.forEach(f => {
+                    let v = getMappedValue(row, f.key); if (v instanceof Date) v = v.toLocaleDateString('pt-BR');
+                    if (!v && v !== 0) v = '<em>Não Informado</em>';
+                    grid.innerHTML += `<div class="detail-item"><span class="detail-label">${f.label}</span><span class="detail-value">${v}</span></div>`;
+                });
+                catDiv.appendChild(grid); container.appendChild(catDiv);
+            });
+            
+            let obD = document.createElement('div'); obD.className = 'detail-category';
+            obD.innerHTML = `<h3>Observações e Histórico Completo</h3><div class="detail-value notes-block">${getMappedValue(row, 'observacoes') || Object.values(row).join(' | ')}</div>`;
+            container.appendChild(obD);
+
+            let exD = document.createElement('div'); exD.className = 'detail-category'; exD.innerHTML = `<h3>Metadados Extras da Planilha</h3>`;
+            let exG = document.createElement('div'); exG.className = 'detail-grid';
+            let mKeys = []; Object.values(fieldMapping).forEach(a => mKeys.push(...a));
+            let hEx = false;
+            Object.entries(row).forEach(([k, v]) => {
+                if (!mKeys.some(a => a.toLowerCase() === k.toLowerCase().trim())) {
+                    hEx = true; let dV = v instanceof Date ? v.toLocaleDateString('pt-BR') : v;
+                    exG.innerHTML += `<div class="detail-item"><span class="detail-label">${k}</span><span class="detail-value">${dV!==''?dV:'-'}</span></div>`;
+                }
+            });
+            if(hEx) { exD.appendChild(exG); container.appendChild(exD); }
+            document.getElementById('sidebarOverlay').classList.add('active');
+        };
+
+        const closeSidebar = () => document.getElementById('sidebarOverlay').classList.remove('active');
+
+        const switchTab = (tabName) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-btn-${tabName}`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            if (tabName === 'dashboard') renderCharts();
+        };
+
+        window.exportTable = (type) => {
+            if (filteredDataGlobal.length === 0) return;
+            const exportData = filteredDataGlobal.map(row => ({
+                'Chamado (Chave)': getMappedValue(row, 'id'), 'Município': getMappedValue(row, 'cliente'), 'Resumo': getMappedValue(row, 'resumo'),
+                'Responsável': getMappedValue(row, 'responsavel'), 'Prioridade': getMappedValue(row, 'prioridade'), 'Status': getMappedValue(row, 'status'),
+                'Tipo': getMappedValue(row, 'tipo'), 'Produto': getMappedValue(row, 'produto'), 'UF': getMappedValue(row, 'uf'),
+                'Data Abertura': getMappedValue(row, 'data_abertura') instanceof Date ? getMappedValue(row, 'data_abertura').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_abertura'),
+                'Dias Aberto': getMappedValue(row, 'dias_aberto'), 'Observações': getMappedValue(row, 'observacoes')
+            }));
+            if (type === 'excel') {
+                const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Dados_Migracao"); XLSX.writeFile(wb, "relatorio_migracao_regional.xlsx");
+            } else if (type === 'csv') {
+                let csvRows = [Object.keys(exportData[0]).join(';')]; exportData.forEach(item => csvRows.push(Object.values(item).map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(';')));
+                let blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.setAttribute("download", "export_migracao_regional.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            } else {
+                let text = Object.keys(exportData[0]).join('\t') + '\n' + exportData.map(i => Object.values(i).join('\t')).join('\n');
+                navigator.clipboard.writeText(text).then(() => alert('Copiado para a Área de Transferência!'));
+            }
+        };
+    </script>
+</body>
+</html>
