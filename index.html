@@ -57,7 +57,7 @@
             --info: #06b6d4;
             --info-light: rgba(6, 182, 212, 0.15);
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 66px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
             --kanban-column-bg: #151f32;
         }
 
@@ -766,11 +766,7 @@
         }
 
         #fileInput { display: none; }
-        
-        /* Ajuste sutil para links na tabela */
-        table td a:hover {
-            text-decoration: underline !important;
-        }
+        table td a:hover { text-decoration: underline !important; }
     </style>
 </head>
 <body class="dark-mode">
@@ -1284,11 +1280,19 @@
             window.requestAnimationFrame(step);
         }
 
+        // FUNÇÃO ADAPTADA: Mapeamento de esteira contendo o quadro dinâmico "Backlog"
         const renderKanban = () => {
             const board = document.getElementById('kanbanBoard'); board.innerHTML = '';
             
-            const targetColumns = ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
+            // Incluído o Backlog no início dos quadros alvo
+            const targetColumns = ["Backlog", "To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
             
+            // Auxiliar para detectar se o chamado não possui um analista válido atribuído
+            const isSemResponsavel = (respStr) => {
+                const r = (respStr || '').toString().trim().toLowerCase();
+                return r === '' || r === 'sem responsável' || r === 'sem responsavel' || r === 'sem resp' || r === 'sem resp.' || r === 'não atribuído' || r === 'nao atribuido' || r === 'não atribuido' || r === 'não atribuida' || r === 'nao atribuida';
+            };
+
             const getColumnForStatus = (statusStr) => {
                 const s = (statusStr || '').toString().trim().toLowerCase();
                 
@@ -1311,6 +1315,7 @@
             };
 
             const getColumnStyle = (colName) => {
+                if (colName === 'Backlog') return { bg: 'var(--info-light)', text: 'var(--info)', border: 'var(--info)' };
                 if (colName === 'Done') return { bg: 'var(--success-light)', text: 'var(--success)', border: 'var(--success)' };
                 if (colName === 'Aguardando solicitante') return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
                 if (colName === 'To do') return { bg: 'var(--kanban-column-bg)', text: 'var(--text-secondary)', border: 'var(--text-secondary)' };
@@ -1323,8 +1328,15 @@
 
             targetColumns.forEach(colName => {
                 let colCardsData = filteredDataGlobal.filter(row => {
+                    const resp = getMappedValue(row, 'responsavel');
                     const s = getMappedValue(row, 'status');
-                    return getColumnForStatus(s) === colName;
+                    
+                    // Se o quadro for Backlog, puxa apenas os sem analista. Caso contrário, joga nas demais colunas se tiver analista.
+                    if (colName === "Backlog") {
+                        return isSemResponsavel(resp);
+                    } else {
+                        return !isSemResponsavel(resp) && getColumnForStatus(s) === colName;
+                    }
                 });
                 
                 colCardsData.sort((a,b) => (prioWeight[(getMappedValue(b,'prioridade')||'').toString().toLowerCase()]||0) - (prioWeight[(getMappedValue(a,'prioridade')||'').toString().toLowerCase()]||0));
@@ -1356,7 +1368,6 @@
                     let prioClass = prioridade.toLowerCase() === 'alta' ? 'prio-alta' : (prioridade.toLowerCase().includes('med') ? 'prio-media' : 'prio-baixa');
                     let isAtrasado = (colName !== 'Done' && dias > 30);
 
-                    // AJUSTE: Criação do Hiperlink para os IDs nos Cards do Kanban
                     const idHtml = id !== '#ID' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" class="card-id" style="text-decoration: none; color: var(--primary);" onclick="event.stopPropagation();">${id}</a>` : `<span>${id}</span>`;
 
                     const cardElement = document.createElement('div');
@@ -1458,7 +1469,6 @@
                 
                 const style = getStatusStyle(st);
 
-                // AJUSTE: Criação do Hiperlink para a Coluna "Chamado" na Tabela de Dados
                 const idHtml = id !== '-' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" style="text-decoration: none; color: var(--primary); font-weight: 700;" onclick="event.stopPropagation();">${id}</a>` : '-';
 
                 tr.innerHTML = `
