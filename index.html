@@ -57,7 +57,7 @@
             --info: #06b6d4;
             --info-light: rgba(6, 182, 212, 0.15);
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 4px 66px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
             --kanban-column-bg: #151f32;
         }
 
@@ -847,16 +847,16 @@
                 <select id="filterPriority" class="form-control"><option value="">Todos</option></select>
             </div>
             <div class="form-group">
-                <label>Tipo</label>
-                <select id="filterType" class="form-control"><option value="">Todos</option></select>
-            </div>
-            <div class="form-group">
                 <label>Produto</label>
                 <select id="filterProduct" class="form-control"><option value="">Todos</option></select>
             </div>
             <div class="form-group">
                 <label>UF</label>
                 <select id="filterUF" class="form-control"><option value="">Todos</option></select>
+            </div>
+            <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px; justify-content: flex-start; min-height: 38px; padding-top: 14px;">
+                <input type="checkbox" id="filterWithResponsible" style="width: 16px; height: 16px; cursor: pointer;">
+                <label for="filterWithResponsible" style="cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin: 0; white-space: nowrap;">C/ resp.</label>
             </div>
         </section>
 
@@ -981,6 +981,11 @@
             observacoes: ['observações', 'observacoes', 'notas', 'comentários', 'comentarios', 'descrição detalhada', 'histórico', 'detalhes']
         };
 
+        const isSemResponsavel = (respStr) => {
+            const r = (respStr || '').toString().trim().toLowerCase();
+            return r === '' || r === 'sem responsável' || r === 'sem responsavel' || r === 'sem resp' || r === 'sem resp.' || r === 'não atribuído' || r === 'nao atribuido' || r === 'não atribuido' || r === 'não atribuida' || r === 'nao atribuida';
+        };
+
         const isStatusConcluido = (statusStr) => {
             const s = (statusStr || '').toString().toLowerCase().trim();
             return s === 'concluído' || s === 'concluido' || s === 'finalizado' || s === 'fechado' || s === 'encerrado';
@@ -1092,8 +1097,12 @@
             document.getElementById('fileInput').addEventListener('change', handleFileUpload);
             document.getElementById('refreshBtn').addEventListener('click', applyFiltersAndRefresh);
 
-            const filters = ['filterSearch', 'filterClient', 'filterResponsible', 'filterStatus', 'filterPriority', 'filterType', 'filterProduct', 'filterUF'];
+            // Filtro tipo removido do array de monitoramento
+            const filters = ['filterSearch', 'filterClient', 'filterResponsible', 'filterStatus', 'filterPriority', 'filterProduct', 'filterUF'];
             filters.forEach(id => document.getElementById(id).addEventListener('input', applyFiltersAndRefresh));
+            
+            // Listener para o novo filtro de Responsável ativo
+            document.getElementById('filterWithResponsible').addEventListener('change', applyFiltersAndRefresh);
 
             document.getElementById('pagLength').addEventListener('change', (e) => { rowsPerPage = parseInt(e.target.value); currentPage = 1; renderTable(); });
             document.getElementById('btnPrevPage').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
@@ -1193,7 +1202,7 @@
             const dropdownConfigs = [
                 { id: 'filterClient', key: 'cliente' }, { id: 'filterResponsible', key: 'responsavel' },
                 { id: 'filterStatus', key: 'status' }, { id: 'filterPriority', key: 'prioridade' },
-                { id: 'filterType', key: 'tipo' }, { id: 'filterProduct', key: 'produto' }, { id: 'filterUF', key: 'uf' }
+                { id: 'filterProduct', key: 'produto' }, { id: 'filterUF', key: 'uf' }
             ];
             dropdownConfigs.forEach(conf => {
                 const selectElement = document.getElementById(conf.id);
@@ -1215,11 +1224,14 @@
             const respVal = document.getElementById('filterResponsible').value;
             const statusVal = document.getElementById('filterStatus').value;
             const prioVal = document.getElementById('filterPriority').value;
-            const typeVal = document.getElementById('filterType').value;
             const prodVal = document.getElementById('filterProduct').value;
             const ufVal = document.getElementById('filterUF').value;
+            const withRespOnly = document.getElementById('filterWithResponsible').checked;
 
             filteredDataGlobal = rawDataGlobal.filter(row => {
+                // AJUSTE: Remove da base global os chamados sem responsável quando o filtro "C/ resp." for ativado
+                if (withRespOnly && isSemResponsavel(getMappedValue(row, 'responsavel'))) return false;
+
                 if (searchText) {
                     let matchText = Object.values(row).some(v => v && v.toString().toLowerCase().includes(searchText));
                     if (!matchText) return false;
@@ -1228,7 +1240,6 @@
                 if (respVal && getMappedValue(row, 'responsavel').toString().trim() !== respVal) return false;
                 if (statusVal && getMappedValue(row, 'status').toString().trim() !== statusVal) return false;
                 if (prioVal && getMappedValue(row, 'prioridade').toString().trim() !== prioVal) return false;
-                if (typeVal && getMappedValue(row, 'tipo').toString().trim() !== typeVal) return false;
                 if (prodVal && getMappedValue(row, 'produto').toString().trim() !== prodVal) return false;
                 if (ufVal && getMappedValue(row, 'uf').toString().trim() !== ufVal) return false;
                 
@@ -1280,19 +1291,15 @@
             window.requestAnimationFrame(step);
         }
 
-        // FUNÇÃO ADAPTADA: Mapeamento de esteira contendo o quadro dinâmico "Backlog"
         const renderKanban = () => {
             const board = document.getElementById('kanbanBoard'); board.innerHTML = '';
+            const withRespOnly = document.getElementById('filterWithResponsible').checked;
             
-            // Incluído o Backlog no início dos quadros alvo
-            const targetColumns = ["Backlog", "To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
+            // AJUSTE: Remove a coluna Backlog da esteira alvo se o filtro "C/ resp." estiver ativo
+            const targetColumns = withRespOnly 
+                ? ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"]
+                : ["Backlog", "To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
             
-            // Auxiliar para detectar se o chamado não possui um analista válido atribuído
-            const isSemResponsavel = (respStr) => {
-                const r = (respStr || '').toString().trim().toLowerCase();
-                return r === '' || r === 'sem responsável' || r === 'sem responsavel' || r === 'sem resp' || r === 'sem resp.' || r === 'não atribuído' || r === 'nao atribuido' || r === 'não atribuido' || r === 'não atribuida' || r === 'nao atribuida';
-            };
-
             const getColumnForStatus = (statusStr) => {
                 const s = (statusStr || '').toString().trim().toLowerCase();
                 
@@ -1331,7 +1338,6 @@
                     const resp = getMappedValue(row, 'responsavel');
                     const s = getMappedValue(row, 'status');
                     
-                    // Se o quadro for Backlog, puxa apenas os sem analista. Caso contrário, joga nas demais colunas se tiver analista.
                     if (colName === "Backlog") {
                         return isSemResponsavel(resp);
                     } else {
