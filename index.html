@@ -231,27 +231,6 @@
             margin-top: 10px;
         }
 
-        /* Barra de Filtros */
-        .filter-bar {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            align-items: end;
-        }
-
-        .filter-bar .search-group {
-            grid-column: span 2;
-        }
-
-        @media (max-width: 1100px) {
-            .filter-bar .search-group { grid-column: span 1; }
-        }
-
         .form-group {
             display: flex;
             flex-direction: column;
@@ -265,21 +244,77 @@
             text-transform: uppercase;
         }
 
-        .form-control {
-            background-color: var(--bg-app);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 8px 10px;
-            font-size: 13px;
-            outline: none;
-            width: 100%;
-            transition: var(--transition);
+        /* ==========================================================
+           UNIFICAÇÃO ESTRUTURAL COMPLETA DOS FILTROS (UI/UX SIMÉTRICA)
+           ========================================================== */
+        .form-control, 
+        #verticalTrigger {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            box-sizing: border-box !important;
+            
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 14px !important;
+            
+            padding: 0 14px !important;
+            height: 42px !important;
+            line-height: 40px !important;
+            
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            outline: none !important;
+            width: 100% !important;
+            box-shadow: var(--shadow-sm), inset 0 1px 0px rgba(255, 255, 255, 0.05) !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px var(--primary-light);
+        /* Correção específica para selects nativos herdarem o comportamento flex */
+        select.form-control {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            cursor: pointer !important;
+            
+            /* Seta dinâmica customizada idêntica à do Vertical trigger */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 14px center !important;
+            background-size: 11px !important;
+            padding-right: 40px !important;
+        }
+
+        body:not(.dark-mode) select.form-control {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e6c84' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+        }
+
+        /* Garante que o input de texto também herde o reset de linha */
+        input[type="text"].form-control {
+            line-height: normal !important;
+        }
+
+        /* Estilização interna das opções dos dropdowns nativos */
+        select.form-control option {
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+            padding: 10px !important;
+        }
+
+        /* Comportamento de Hover Unificado */
+        .form-control:hover, 
+        #verticalTrigger:hover {
+            border-color: var(--primary) !important;
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        /* Comportamento de Foco / Seleção Ativa Unificado */
+        .form-control:focus,
+        #verticalTrigger:focus-within,
+        #verticalTrigger.open {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px var(--primary-light) !important;
         }
 
         /* Menu de Navegação por Abas */
@@ -767,37 +802,162 @@
 
         #fileInput { display: none; }
         table td a:hover { text-decoration: underline !important; }
-        
+
+        /* Estilos do Botão Toggle Slider */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border-color);
+            transition: .3s;
+            border-radius: 22px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 3px; bottom: 3px;
+            background-color: #ffffff;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        /* ==========================================================
+           REFINAMENTO UI/UX - DESIGN COMPLETO DO MULTISELECT
+           ========================================================== */
+
+        /* Ícone da Seta do Seletor com Animação */
+        #verticalTrigger i {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-secondary);
+        }
+
+        #verticalTrigger.open i {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+
+        /* Painel Dropdown Flutuante */
         .multiselect-panel {
             display: none;
             position: absolute;
-            top: 100%;
+            top: calc(100% + 6px);
             left: 0;
             width: 100%;
-            max-height: 200px;
+            max-height: 240px;
             overflow-y: auto;
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
+            border-radius: 12px;
             z-index: 1000;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
             padding: 4px;
+            animation: dropdownEntrance 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform-origin: top;
         }
+
+        @keyframes dropdownEntrance {
+            from { opacity: 0; transform: scale(0.97) translateY(-4px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Scrollbar Moderna no Dropdown */
+        .multiselect-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+        .multiselect-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .multiselect-panel::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        .multiselect-panel::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Linha do Item */
         .multiselect-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 8px;
+            gap: 12px;
+            padding: 0 12px;
+            height: 42px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 500;
             color: var(--text-primary);
-            transition: background 0.15s;
+            transition: all 0.18s ease;
+            user-select: none;
+            position: relative;
         }
+
         .multiselect-item:hover {
-            background-color: var(--primary-light);
+            background-color: var(--primary-light) !important;
+            color: var(--primary);
         }
-        body.dark-mode .multiselect-item:hover {
-            background-color: rgba(56, 189, 248, 0.15);
+
+        /* Ocultar Checkbox Quadrado Nativo */
+        .multiselect-item input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0; width: 0;
+        }
+
+        /* Seletor Circular Customizado (Radio-like) */
+        .multiselect-item::before {
+            content: "";
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            background-color: transparent;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+
+        .multiselect-item:hover::before {
+            border-color: var(--primary);
+        }
+
+        /* Estado Marcado */
+        .multiselect-item:has(input[type="checkbox"]:checked) {
+            color: var(--primary);
+            background-color: rgba(56, 189, 248, 0.08);
+        }
+
+        .multiselect-item:has(input[type="checkbox"]:checked)::before {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+            background-size: 11px;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: scale(1.05);
+        }
+
+        .multiselect-item:active::before {
+            transform: scale(0.9);
         }
     </style>
 </head>
@@ -857,47 +1017,59 @@
             </div>
         </section>
 
-        <section class="filter-bar">
-            <div class="form-group search-group">
-                <label>Pesquisa por Texto</label>
-                <input type="text" id="filterSearch" class="form-control" placeholder="Buscar por chamado, resumo, notas...">
-            </div>
-            <div class="form-group">
-                <label>Município</label>
-                <select id="filterClient" class="form-control"><option value="">Todos</option></select>
-            </div>
-            <div class="form-group">
-                <label>Responsável</label>
-                <select id="filterResponsible" class="form-control"><option value="">Todos</option></select>
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select id="filterStatus" class="form-control"><option value="">Todos</option></select>
-            </div>
-            <div class="form-group">
-                <label>Prioridade</label>
-                <select id="filterPriority" class="form-control"><option value="">Todos</option></select>
-            </div>
-            <div class="form-group">
-                <label>Produto</label>
-                <select id="filterProduct" class="form-control"><option value="">Todos</option></select>
-            </div>
-            <div class="form-group">
-                <label>UF</label>
-                <select id="filterUF" class="form-control"><option value="">Todos</option></select>
-            </div>
-            <div class="form-group" style="position: relative;">
-                <label>Vertical</label>
-                <div class="form-control" id="verticalTrigger" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
-                    <span id="verticalText">Todos</span>
-                    <i class="fa-solid fa-chevron-down" style="font-size: 10px; opacity: 0.5;"></i>
+        <section class="filter-bar-container" style="background-color: var(--bg-card); border-radius: var(--radius-md); padding: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 16px;">
+            <div class="filter-main-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end;">
+                <div class="form-group search-group" style="grid-column: span 2;">
+                    <label>Pesquisa por Texto</label>
+                    <input type="text" id="filterSearch" class="form-control" placeholder="Buscar por chamado, resumo, notas...">
                 </div>
-                <div class="multiselect-panel" id="verticalPanel">
+                <div class="form-group">
+                    <label>Responsável</label>
+                    <select id="filterResponsible" class="form-control"><option value="">Todos</option></select>
+                </div>
+                <div class="form-group" style="position: relative;">
+                    <label>Vertical</label>
+                    <div class="form-control" id="verticalTrigger">
+                        <span id="verticalText">Todos</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 10px; opacity: 0.5;"></i>
+                    </div>
+                    <div class="multiselect-panel" id="verticalPanel"></div>
+                </div>
+                <div class="form-group" style="align-items: flex-start; justify-content: flex-end; min-height: 48px; width: max-content;">
+                    <label style="margin-bottom: 4px;">C/ Resp.</label>
+                    <label class="switch">
+                        <input type="checkbox" id="filterWithResponsible" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="form-group" style="justify-content: flex-end;">
+                    <button class="btn" id="toggleAdvancedFilters" style="width: 100%; justify-content: center; background-color: var(--primary-light); color: var(--primary); border-color: transparent;">
+                        <i class="fa-solid fa-sliders"></i> Avançado
+                    </button>
                 </div>
             </div>
-            <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px; justify-content: flex-start; min-height: 38px; padding-top: 14px;">
-                <input type="checkbox" id="filterWithResponsible" style="width: 16px; height: 16px; cursor: pointer;">
-                <label for="filterWithResponsible" style="cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin: 0; white-space: nowrap;">C/ resp.</label>
+
+            <div id="advancedFiltersRow" style="display: none; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; border-top: 1px dashed var(--border-color); padding-top: 16px; animation: fadeIn 0.25s ease-out;">
+                <div class="form-group">
+                    <label>Município</label>
+                    <select id="filterClient" class="form-control"><option value="">Todos</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="filterStatus" class="form-control"><option value="">Todos</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Prioridade</label>
+                    <select id="filterPriority" class="form-control"><option value="">Todos</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Produto</label>
+                    <select id="filterProduct" class="form-control"><option value="">Todos</option></select>
+                </div>
+                <div class="form-group">
+                    <label>UF</label>
+                    <select id="filterUF" class="form-control"><option value="">Todos</option></select>
+                </div>
             </div>
         </section>
 
@@ -908,8 +1080,7 @@
         </nav>
 
         <div id="tab-kanban" class="tab-content active">
-            <div class="kanban-board" id="kanbanBoard">
-                </div>
+            <div class="kanban-board" id="kanbanBoard"></div>
         </div>
 
         <div id="tab-dashboard" class="tab-content">
@@ -958,11 +1129,9 @@
                 <div class="table-container">
                     <table id="dataTableMain">
                         <thead>
-                            <tr id="tableHeaderRow">
-                                </tr>
+                            <tr id="tableHeaderRow"></tr>
                         </thead>
-                        <tbody id="tableBody">
-                            </tbody>
+                        <tbody id="tableBody"></tbody>
                     </table>
                 </div>
                 <div class="pagination-bar">
@@ -991,8 +1160,7 @@
                 <h2>Detalhes Completos do Chamado</h2>
                 <button class="sidebar-close" id="sidebarCloseBtn">&times;</button>
             </div>
-            <div class="sidebar-content" id="sidebarFieldsContainer">
-                </div>
+            <div class="sidebar-content" id="sidebarFieldsContainer"></div>
         </div>
     </div>
 
@@ -1019,7 +1187,8 @@
             data_abertura: ['criado', 'data_abertura', 'abertura', 'data de abertura', 'criado em', 'data', 'created_at', 'data de criação', 'data/hora'],
             prazo: ['prazo', 'data limite', 'vencimento', 'sla', 'deadline', 'vence em', 'limite'],
             dias_aberto: ['dias em aberto', 'dias_aberto', 'dias', 'tempo em aberto', 'age', 'dias decorridos', 'atraso'],
-            observacoes: ['observações', 'observacoes', 'notas', 'comentários', 'comentarios', 'descrição detalhada', 'histórico', 'detalhes']
+            observacoes: ['observações', 'observacoes', 'notas', 'comentários', 'comentarios', 'descrição detalhada', 'histórico', 'detalhes'],
+            previsao_solucao: ['previsão de solução', 'previsao de solucao', 'previsão', 'previsao', 'data previsão', 'data previsao', 'solução estimada', 'resolução', 'data da resolucao']
         };
 
         const isSemResponsavel = (respStr) => {
@@ -1041,7 +1210,7 @@
             if (s === 'aguardando solicitante' || s === 'aguardando informações (planejamento)' || s === 'aguardando informacoes (planejamento)' || s === 'aguardando dependência' || s === 'aguardando dependencia' || s === 'produto' || s === 'aguardando revenda') {
                 return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
             }
-            if (s === 'aguardando planejamento' || s === 'em planejamento' || s === 'aguardando atendimento (fl)' || s === 'aguardando atendimento' || s === 'não iniciada' || s === 'nao iniciada') {
+            if (s === 'aguardando planejamento' || s === 'em planejamento' || s === 'aguardando atendimento (fl)', 'aguardando atendimento' || s === 'não iniciada' || s === 'nao iniciada') {
                 return { bg: 'var(--kanban-column-bg)', text: 'var(--text-secondary)', border: 'var(--text-secondary)' };
             }
             if (s === 'em atendimento' || s === 'em atendimento (fl)' || s === 'em atendimento n2 (sup)' || s === 'em atendimento n2') {
@@ -1164,12 +1333,27 @@
             if (trigger && panel) {
                 trigger.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+                    const isVisible = panel.style.display === 'block';
+                    panel.style.display = isVisible ? 'none' : 'block';
+                    trigger.classList.toggle('open', !isVisible);
                 });
                 document.addEventListener('click', (e) => {
                     if (!panel.contains(e.target) && e.target !== trigger) {
                         panel.style.display = 'none';
+                        trigger.classList.remove('open');
                     }
+                });
+            }
+
+            // Ativação do colapso dos Filtros Avançados
+            const toggleAdvBtn = document.getElementById('toggleAdvancedFilters');
+            const advancedRow = document.getElementById('advancedFiltersRow');
+            if (toggleAdvBtn && advancedRow) {
+                toggleAdvBtn.addEventListener('click', () => {
+                    const isHidden = advancedRow.style.display === 'none';
+                    advancedRow.style.display = isHidden ? 'grid' : 'none';
+                    toggleAdvBtn.style.backgroundColor = isHidden ? 'var(--primary)' : 'var(--primary-light)';
+                    toggleAdvBtn.style.color = isHidden ? '#ffffff' : 'var(--primary)';
                 });
             }
         };
@@ -1408,7 +1592,7 @@
             
             const targetColumns = withRespOnly 
                 ? ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"]
-                : ["Backlog", "To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
+                : ["Backlog"];
             
             const getColumnForStatus = (statusStr) => {
                 const s = (statusStr || '').toString().trim().toLowerCase();
@@ -1478,20 +1662,31 @@
                     const responsavel = getMappedValue(row, 'responsavel') || 'Não Atribuído';
                     const prioridade = (getMappedValue(row, 'prioridade') || 'Baixa').toString().trim();
                     const dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
+                    
                     let rD = getMappedValue(row, 'data_abertura');
                     let dOpen = rD instanceof Date ? rD.toLocaleDateString('pt-BR') : (rD || '-');
+
+                    let rP = getMappedValue(row, 'previsao_solucao');
+                    let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '');
 
                     let prioClass = prioridade.toLowerCase() === 'alta' ? 'prio-alta' : (prioridade.toLowerCase().includes('med') ? 'prio-media' : 'prio-baixa');
                     let isAtrasado = (colName !== 'Done' && dias > 30);
 
+                    let alertaFaltaPrevisaoHtml = '';
+                    if (!isSemResponsavel(responsavel) && !dPrev) {
+                        alertaFaltaPrevisaoHtml = `<i class="fa-solid fa-triangle-exclamation" style="color: var(--warning); margin-left: 6px;" title="Alerta: Ticket com responsável atribuído, mas sem previsão de solução!"></i>`;
+                    }
+
                     const idHtml = id !== '#ID' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" class="card-id" style="text-decoration: none; color: var(--primary);" onclick="event.stopPropagation();">${id}</a>` : `<span>${id}</span>`;
+                    const prevHtml = dPrev ? `<div style="font-size: 11px; margin-top: 4px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-calendar-check" style="opacity: 0.7;"></i> Prev: <span style="font-weight: 600; color: var(--text-primary);">${dPrev}</span></div>` : '';
 
                     const cardElement = document.createElement('div');
                     cardElement.className = `kanban-card ${prioClass} ${isAtrasado ? 'card-atrasado' : ''}`;
                     cardElement.innerHTML = `
-                        <div class="card-header-row">${idHtml}<span>${dOpen}</span></div>
+                        <div class="card-header-row"><div>${idHtml}${alertaFaltaPrevisaoHtml}</div><span>${dOpen}</span></div>
                         <div class="card-client"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:4px; opacity:0.6;"></i>${municipio}</div>
                         <div class="card-summary">${resumo.substring(0, 75)}${resumo.length > 75 ? '...' : ''}</div>
+                        ${prevHtml}
                         <div class="card-footer-row"><span class="card-responsible"><i class="fa-regular fa-user"></i> ${responsavel || '<em>Sem resp.</em>'}</span><span class="card-days ${dias>30?'danger':(dias>15?'warn':'ok')}">${dias}d</span></div>
                     `;
                     cardElement.addEventListener('click', () => openSidebarDetails(row));
@@ -1546,7 +1741,17 @@
 
         const renderTableStructure = () => {
             const row = document.getElementById('tableHeaderRow'); if(!row) return; row.innerHTML = '';
-            const cols = [{key:'id', label:'Chamado'}, {key:'cliente', label:'Município'}, {key:'resumo', label:'Resumo / Assunto'}, {key:'responsavel', label:'Responsável'}, {key:'prioridade', label:'Prioridade'}, {key:'status', label:'Status'}, {key:'dias_aberto', label:'Dias'}, {key:'data_abertura', label:'Abertura'}];
+            const cols = [
+                {key:'id', label:'Chamado'}, 
+                {key:'cliente', label:'Município'}, 
+                {key:'resumo', label:'Resumo / Assunto'}, 
+                {key:'responsavel', label:'Responsável'}, 
+                {key:'prioridade', label:'Prioridade'}, 
+                {key:'status', label:'Status'}, 
+                {key:'dias_aberto', label:'Dias'}, 
+                {key:'data_abertura', label:'Abertura'},
+                {key:'previsao_solucao', label:'Previsão Solução'}
+            ];
             cols.forEach(c => {
                 let th = document.createElement('th'); th.innerText = c.label;
                 th.innerHTML += currentSortColumn === c.key ? (currentSortDirection === 'asc'?' <i class="fa-solid fa-sort-up"></i>':' <i class="fa-solid fa-sort-down"></i>') : ' <i class="fa-solid fa-sort" style="opacity:0.2"></i>';
@@ -1559,7 +1764,7 @@
             filteredDataGlobal.sort((a, b) => {
                 let vA = getMappedValue(a, key), vB = getMappedValue(b, key);
                 if (key === 'dias_aberto') { vA = parseInt(vA)||0; vB = parseInt(vB)||0; }
-                else if (key === 'data_abertura') { vA = parseSafeDate(vA).getTime(); vB = parseSafeDate(vB).getTime(); }
+                else if (key === 'data_abertura' || key === 'previsao_solucao') { vA = parseSafeDate(vA).getTime(); vB = parseSafeDate(vB).getTime(); }
                 else { vA = (vA||'').toString().toLowerCase(); vB = (vB||'').toString().toLowerCase(); }
                 return vA < vB ? (currentSortDirection==='asc'?-1:1) : (vA > vB ? (currentSortDirection==='asc'?1:-1) : 0);
             });
@@ -1568,7 +1773,7 @@
         const renderTable = () => {
             const tbody = document.getElementById('tableBody'); if(!tbody) return; tbody.innerHTML = '';
             const tot = filteredDataGlobal.length; document.getElementById('tableCount').innerText = tot; document.getElementById('pagTotal').innerText = tot;
-            if (tot === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">Nenhum registro localizado.</td></tr>'; return; }
+            if (tot === 0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px;">Nenhum registro localizado.</td></tr>'; return; }
             
             const tPages = Math.ceil(tot / rowsPerPage); if (currentPage > tPages) currentPage = tPages || 1;
             const start = (currentPage - 1) * rowsPerPage, end = Math.min(start + rowsPerPage, tot);
@@ -1581,7 +1786,12 @@
                 let prio = (getMappedValue(row, 'prioridade') || 'Baixa').toString().trim();
                 let st = (getMappedValue(row, 'status') || 'Aberto').toString().trim();
                 let dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
-                let rD = getMappedValue(row, 'data_abertura'); let dOp = rD instanceof Date ? rD.toLocaleDateString('pt-BR') : (rD || '-');
+                
+                let rD = getMappedValue(row, 'data_abertura'); 
+                let dOp = rD instanceof Date ? rD.toLocaleDateString('pt-BR') : (rD || '-');
+                
+                let rP = getMappedValue(row, 'previsao_solucao');
+                let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '-');
                 
                 const style = getStatusStyle(st);
 
@@ -1596,6 +1806,7 @@
                     <td><span class="badge" style="background-color:${style.bg}; color:${style.text}; border: 1px solid ${style.border};">${st}</span></td>
                     <td style="font-weight:700; color: ${dias > 30 ? 'var(--danger)' : 'inherit'};">${dias}d</td>
                     <td>${dOp}</td>
+                    <td style="font-weight:600;">${dPrev}</td>
                 `;
                 tr.addEventListener('click', () => openSidebarDetails(row)); tbody.appendChild(tr);
             });
@@ -1607,7 +1818,7 @@
                 { title: 'Informações Gerais do Chamado', fields: [{ label: 'Número do Chamado (Chave)', key: 'id' }, { label: 'Vertical / BU', key: 'vertical' }, { label: 'Produto Vinculado', key: 'produto' }] },
                 { title: 'Dados de Identificação Regional', fields: [{ label: 'Município', key: 'cliente' }, { label: 'UF / Região', key: 'uf' }] },
                 { title: 'Responsável Técnico', fields: [{ label: 'Profissional Atribuído', key: 'responsavel' }] },
-                { title: 'Prazos e Cronologia', fields: [{ label: 'Data de Abertura (Criado)', key: 'data_abertura' }, { label: 'Prazo Limite / SLA', key: 'prazo' }, { label: 'Dias Correntes em Aberto', key: 'dias_aberto' }] },
+                { title: 'Prazos e Cronologia', fields: [{ label: 'Data de Abertura (Criado)', key: 'data_abertura' }, { label: 'Prazo Limite / SLA', key: 'prazo' }, { label: 'Previsão de Solução', key: 'previsao_solucao' }, { label: 'Dias Correntes em Aberto', key: 'dias_aberto' }] },
                 { title: 'Situação Operacional', fields: [{ label: 'Status Atual', key: 'status' }, { label: 'Nível de Prioridade', key: 'prioridade' }] }
             ];
             cats.forEach(cat => {
@@ -1657,6 +1868,7 @@
                 'Responsável': getMappedValue(row, 'responsavel'), 'Prioridade': getMappedValue(row, 'prioridade'), 'Status': getMappedValue(row, 'status'),
                 'Vertical': getMappedValue(row, 'vertical'), 'Produto': getMappedValue(row, 'produto'), 'UF': getMappedValue(row, 'uf'),
                 'Data Abertura': getMappedValue(row, 'data_abertura') instanceof Date ? getMappedValue(row, 'data_abertura').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_abertura'),
+                'Previsão de Solução': getMappedValue(row, 'previsao_solucao') instanceof Date ? getMappedValue(row, 'previsao_solucao').toLocaleDateString('pt-BR') : getMappedValue(row, 'previsao_solucao'),
                 'Dias Aberto': getMappedValue(row, 'dias_aberto'), 'Observações': getMappedValue(row, 'observacoes')
             }));
             if (type === 'excel') {
