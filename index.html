@@ -244,9 +244,7 @@
             text-transform: uppercase;
         }
 
-        /* ==========================================================
-           UNIFICAÇÃO ESTRUTURAL COMPLETA DOS FILTROS (UI/UX SIMÉTRICA)
-           ========================================================== */
+        /* UNIFICAÇÃO ESTRUTURAL COMPLETA DOS FILTROS (UI/UX SIMÉTRICA) */
         .form-control, 
         #verticalTrigger {
             display: flex !important;
@@ -278,7 +276,6 @@
             -moz-appearance: none !important;
             cursor: pointer !important;
             
-            /* Seta dinâmica customizada idêntica à do Vertical trigger */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
             background-repeat: no-repeat !important;
             background-position: right 14px center !important;
@@ -839,11 +836,7 @@
             transform: translateX(18px);
         }
 
-        /* ==========================================================
-           REFINAMENTO UI/UX - DESIGN COMPLETO DO MULTISELECT
-           ========================================================== */
-
-        /* Ícone da Seta do Seletor com Animação */
+        /* REFINAMENTO UI/UX - DESIGN COMPLETO DO MULTISELECT */
         #verticalTrigger i {
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             color: var(--text-secondary);
@@ -1210,7 +1203,7 @@
             if (s === 'aguardando solicitante' || s === 'aguardando informações (planejamento)' || s === 'aguardando informacoes (planejamento)' || s === 'aguardando dependência' || s === 'aguardando dependencia' || s === 'produto' || s === 'aguardando revenda') {
                 return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
             }
-            if (s === 'aguardando planejamento' || s === 'em planejamento' || s === 'aguardando atendimento (fl)', 'aguardando atendimento' || s === 'não iniciada' || s === 'nao iniciada') {
+            if (s === 'aguardando planejamento' || s === 'em planejamento' || s === 'aguardando atendimento (fl)' || s === 'aguardando atendimento' || s === 'não iniciada' || s === 'nao iniciada') {
                 return { bg: 'var(--kanban-column-bg)', text: 'var(--text-secondary)', border: 'var(--text-secondary)' };
             }
             if (s === 'em atendimento' || s === 'em atendimento (fl)' || s === 'em atendimento n2 (sup)' || s === 'em atendimento n2') {
@@ -1345,7 +1338,6 @@
                 });
             }
 
-            // Ativação do colapso dos Filtros Avançados
             const toggleAdvBtn = document.getElementById('toggleAdvancedFilters');
             const advancedRow = document.getElementById('advancedFiltersRow');
             if (toggleAdvBtn && advancedRow) {
@@ -1668,17 +1660,29 @@
 
                     let rP = getMappedValue(row, 'previsao_solucao');
                     let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '');
+                    
+                    // CORREÇÃO: Lógica segura para verificar se a previsão de fechamento está vencida
+                    let iconeVencido = '';
+                    if (colName !== 'Done' && rP) {
+                        const dataPrevista = parseSafeDate(rP);
+                        const hoje = new Date();
+                        hoje.setHours(0,0,0,0);
+                        if (dataPrevista && dataPrevista.getTime() !== 0 && dataPrevista < hoje) {
+                            iconeVencido = '⛔ ';
+                        }
+                    }
 
                     let prioClass = prioridade.toLowerCase() === 'alta' ? 'prio-alta' : (prioridade.toLowerCase().includes('med') ? 'prio-media' : 'prio-baixa');
                     let isAtrasado = (colName !== 'Done' && dias > 30);
 
+                    // Alerta ignorado se estiver na coluna "Done"
                     let alertaFaltaPrevisaoHtml = '';
-                    if (!isSemResponsavel(responsavel) && !dPrev) {
+                    if (colName !== 'Done' && !isSemResponsavel(responsavel) && !dPrev) {
                         alertaFaltaPrevisaoHtml = `<i class="fa-solid fa-triangle-exclamation" style="color: var(--warning); margin-left: 6px;" title="Alerta: Ticket com responsável atribuído, mas sem previsão de solução!"></i>`;
                     }
 
                     const idHtml = id !== '#ID' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" class="card-id" style="text-decoration: none; color: var(--primary);" onclick="event.stopPropagation();">${id}</a>` : `<span>${id}</span>`;
-                    const prevHtml = dPrev ? `<div style="font-size: 11px; margin-top: 4px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-calendar-check" style="opacity: 0.7;"></i> Prev: <span style="font-weight: 600; color: var(--text-primary);">${dPrev}</span></div>` : '';
+                    const prevHtml = dPrev ? `<div style="font-size: 11px; margin-top: 4px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-calendar-check" style="opacity: 0.7;"></i> Prev: <span style="font-weight: 600; color: var(--text-primary);">${iconeVencido}${dPrev}</span></div>` : '';
 
                     const cardElement = document.createElement('div');
                     cardElement.className = `kanban-card ${prioClass} ${isAtrasado ? 'card-atrasado' : ''}`;
@@ -1793,6 +1797,17 @@
                 let rP = getMappedValue(row, 'previsao_solucao');
                 let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '-');
                 
+                // CORREÇÃO: Lógica segura para verificar se a previsão de fechamento está vencida na Tabela
+                let iconeVencidoTabela = '';
+                if (!isStatusConcluido(st) && rP) {
+                    const dataPrevista = parseSafeDate(rP);
+                    const hoje = new Date();
+                    hoje.setHours(0,0,0,0);
+                    if (dataPrevista && dataPrevista.getTime() !== 0 && dataPrevista < hoje) {
+                        iconeVencidoTabela = '⛔ ';
+                    }
+                }
+                
                 const style = getStatusStyle(st);
 
                 const idHtml = id !== '-' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" style="text-decoration: none; color: var(--primary); font-weight: 700;" onclick="event.stopPropagation();">${id}</a>` : '-';
@@ -1806,7 +1821,7 @@
                     <td><span class="badge" style="background-color:${style.bg}; color:${style.text}; border: 1px solid ${style.border};">${st}</span></td>
                     <td style="font-weight:700; color: ${dias > 30 ? 'var(--danger)' : 'inherit'};">${dias}d</td>
                     <td>${dOp}</td>
-                    <td style="font-weight:600;">${dPrev}</td>
+                    <td style="font-weight:600;">${iconeVencidoTabela}${dPrev}</td>
                 `;
                 tr.addEventListener('click', () => openSidebarDetails(row)); tbody.appendChild(tr);
             });
