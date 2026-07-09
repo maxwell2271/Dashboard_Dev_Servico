@@ -244,7 +244,7 @@
             text-transform: uppercase;
         }
 
-        /* UNIFICAÇÃO ESTRUTURAL COMPLETA DOS FILTROS (UI/UX SIMÉTRICA) */
+        /* UNIFICAÇÃO ESTRUTURAL COMPLETA DOS FILTROS */
         .form-control, 
         #verticalTrigger {
             display: flex !important;
@@ -269,44 +269,39 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        /* Correção específica para selects nativos herdarem o comportamento flex */
         select.form-control {
-            appearance: none !important;
-            -webkit-appearance: none !important;
-            -moz-appearance: none !important;
-            cursor: pointer !important;
-            
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 14px center !important;
-            background-size: 11px !important;
-            padding-right: 40px !important;
-        }
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    cursor: pointer !important;
+    
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important; /* CORRIGIDO AQUI */
+    background-position: right 14px center !important;
+    background-size: 11px !important;
+    padding-right: 40px !important;
+}
 
         body:not(.dark-mode) select.form-control {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e6c84' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
         }
 
-        /* Garante que o input de texto também herde o reset de linha */
         input[type="text"].form-control {
             line-height: normal !important;
         }
 
-        /* Estilização interna das opções dos dropdowns nativos */
         select.form-control option {
             background-color: var(--bg-card) !important;
             color: var(--text-primary) !important;
             padding: 10px !important;
         }
 
-        /* Comportamento de Hover Unificado */
         .form-control:hover, 
         #verticalTrigger:hover {
             border-color: var(--primary) !important;
             box-shadow: var(--shadow-md) !important;
         }
 
-        /* Comportamento de Foco / Seleção Ativa Unificado */
         .form-control:focus,
         #verticalTrigger:focus-within,
         #verticalTrigger.open {
@@ -836,7 +831,6 @@
             transform: translateX(18px);
         }
 
-        /* REFINAMENTO UI/UX - DESIGN COMPLETO DO MULTISELECT */
         #verticalTrigger i {
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             color: var(--text-secondary);
@@ -871,7 +865,6 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* Scrollbar Moderna no Dropdown */
         .multiselect-panel::-webkit-scrollbar {
             width: 5px;
         }
@@ -886,7 +879,6 @@
             background: var(--text-secondary);
         }
 
-        /* Linha do Item */
         .multiselect-item {
             display: flex;
             align-items: center;
@@ -908,7 +900,6 @@
             color: var(--primary);
         }
 
-        /* Ocultar Checkbox Quadrado Nativo */
         .multiselect-item input[type="checkbox"] {
             position: absolute;
             opacity: 0;
@@ -916,7 +907,6 @@
             height: 0; width: 0;
         }
 
-        /* Seletor Circular Customizado (Radio-like) */
         .multiselect-item::before {
             content: "";
             display: inline-block;
@@ -933,7 +923,6 @@
             border-color: var(--primary);
         }
 
-        /* Estado Marcado */
         .multiselect-item:has(input[type="checkbox"]:checked) {
             color: var(--primary);
             background-color: rgba(56, 189, 248, 0.08);
@@ -1181,7 +1170,8 @@
             prazo: ['prazo', 'data limite', 'vencimento', 'sla', 'deadline', 'vence em', 'limite'],
             dias_aberto: ['dias em aberto', 'dias_aberto', 'dias', 'tempo em aberto', 'age', 'dias decorridos', 'atraso'],
             observacoes: ['observações', 'observacoes', 'notas', 'comentários', 'comentarios', 'descrição detalhada', 'histórico', 'detalhes'],
-            previsao_solucao: ['previsão de solução', 'previsao de solucao', 'previsão', 'previsao', 'data previsão', 'data previsao', 'solução estimada', 'resolução', 'data da resolucao']
+            previsao_solucao: ['previsão de solução', 'previsao de solucao', 'previsão', 'previsao', 'data previsão', 'data previsao', 'solução estimada', 'resolução', 'data da resolucao'],
+            data_conclusao: ['data resolvido', 'resolvido', 'concluído em', 'concluido em', 'data da conclusão', 'data fechamento']
         };
 
         const isSemResponsavel = (respStr) => {
@@ -1200,13 +1190,13 @@
             if (s === 'fechado' || s === 'concluído' || s === 'concluido') {
                 return { bg: 'var(--success-light)', text: 'var(--success)', border: 'var(--success)' };
             }
-            if (s === 'aguardando solicitante' || s === 'aguardando informações (planejamento)' || s === 'aguardando informacoes (planejamento)' || s === 'aguardando dependência' || s === 'aguardando dependencia' || s === 'produto' || s === 'aguardando revenda') {
+            if (['aguardando solicitante', 'aguardando informações (planejamento)', 'aguardando informacoes (planejamento)', 'aguardando dependência', 'aguardando dependencia', 'produto', 'aguardando revenda', 'aguardando aprovação', 'aguardando aprovacao', 'aguardando negociação', 'aguardando negociacao'].includes(s)) {
                 return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
             }
-            if (s === 'aguardando planejamento' || s === 'em planejamento' || s === 'aguardando atendimento (fl)' || s === 'aguardando atendimento' || s === 'não iniciada' || s === 'nao iniciada') {
+            if (['aguardando planejamento', 'em planejamento', 'aguardando atendimento (fl)', 'aguardando atendimento', 'não iniciada', 'nao iniciada'].includes(s)) {
                 return { bg: 'var(--kanban-column-bg)', text: 'var(--text-secondary)', border: 'var(--text-secondary)' };
             }
-            if (s === 'em atendimento' || s === 'em atendimento (fl)' || s === 'em atendimento n2 (sup)' || s === 'em atendimento n2') {
+            if (['em atendimento', 'em atendimento (fl)', 'em atendimento n2 (sup)', 'em atendimento n2', 'em andamento'].includes(s)) {
                 return { bg: 'var(--warning-light)', text: 'var(--warning)', border: 'var(--warning)' };
             }
 
@@ -1592,13 +1582,13 @@
                 if (['não iniciada', 'nao iniciada', 'aguardando planejamento', 'em planejamento', 'aguardando atendimento (fl)', 'aguardando atendimento'].includes(s)) {
                     return 'To do';
                 }
-                if (['em atendimento (fl)', 'em atendimento', 'em atendimento n2 (sup)', 'em atendimento n2'].includes(s)) {
+                if (['em atendimento (fl)', 'em atendimento', 'em atendimento n2 (sup)', 'em atendimento n2', 'em andamento'].includes(s)) {
                     return 'Doing';
                 }
                 if (['fechado', 'concluído', 'concluido', 'finalizado', 'encerrado'].includes(s)) {
                     return 'Done';
                 }
-                if (['aguardando informações (planejamento)', 'aguardando informacoes (planejamento)', 'aguardando solicitante', 'aguardando revenda'].includes(s)) {
+                if (['aguardando informações (planejamento)', 'aguardando informacoes (planejamento)', 'aguardando solicitante', 'aguardando revenda', 'aguardando aprovação', 'aguardando aprovacao', 'aguardando negociação', 'aguardando negociacao'].includes(s)) {
                     return 'Aguardando solicitante';
                 }
                 if (['produto', 'aguardando dependência', 'aguardando dependencia'].includes(s)) {
@@ -1659,30 +1649,34 @@
                     let dOpen = rD instanceof Date ? rD.toLocaleDateString('pt-BR') : (rD || '-');
 
                     let rP = getMappedValue(row, 'previsao_solucao');
-                    let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '');
+                    let rC = getMappedValue(row, 'data_conclusao');
                     
-                    // CORREÇÃO: Lógica segura para verificar se a previsão de fechamento está vencida
-                    let iconeVencido = '';
-                    if (colName !== 'Done' && rP) {
+                    let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '');
+                    let dConcl = rC instanceof Date ? rC.toLocaleDateString('pt-BR') : (rC || '');
+                    
+                    let footerDateHtml = '';
+                    if (colName === 'Done') {
+                        footerDateHtml = `<div style="font-size: 11px; margin-top: 4px; color: var(--success); display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-calendar-check" style="opacity: 0.7;"></i> Concluído em: <span style="font-weight: 600;">${dConcl || dOpen}</span></div>`;
+                    } else if (dPrev) {
+                        let iconeVencido = '';
                         const dataPrevista = parseSafeDate(rP);
                         const hoje = new Date();
                         hoje.setHours(0,0,0,0);
                         if (dataPrevista && dataPrevista.getTime() !== 0 && dataPrevista < hoje) {
                             iconeVencido = '⛔ ';
                         }
+                        footerDateHtml = `<div style="font-size: 11px; margin-top: 4px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-calendar-check" style="opacity: 0.7;"></i> Prev: <span style="font-weight: 600; color: var(--text-primary);">${iconeVencido}${dPrev}</span></div>`;
                     }
 
                     let prioClass = prioridade.toLowerCase() === 'alta' ? 'prio-alta' : (prioridade.toLowerCase().includes('med') ? 'prio-media' : 'prio-baixa');
                     let isAtrasado = (colName !== 'Done' && dias > 30);
 
-                    // Alerta ignorado se estiver na coluna "Done"
                     let alertaFaltaPrevisaoHtml = '';
                     if (colName !== 'Done' && !isSemResponsavel(responsavel) && !dPrev) {
                         alertaFaltaPrevisaoHtml = `<i class="fa-solid fa-triangle-exclamation" style="color: var(--warning); margin-left: 6px;" title="Alerta: Ticket com responsável atribuído, mas sem previsão de solução!"></i>`;
                     }
 
                     const idHtml = id !== '#ID' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" class="card-id" style="text-decoration: none; color: var(--primary);" onclick="event.stopPropagation();">${id}</a>` : `<span>${id}</span>`;
-                    const prevHtml = dPrev ? `<div style="font-size: 11px; margin-top: 4px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-calendar-check" style="opacity: 0.7;"></i> Prev: <span style="font-weight: 600; color: var(--text-primary);">${iconeVencido}${dPrev}</span></div>` : '';
 
                     const cardElement = document.createElement('div');
                     cardElement.className = `kanban-card ${prioClass} ${isAtrasado ? 'card-atrasado' : ''}`;
@@ -1690,7 +1684,7 @@
                         <div class="card-header-row"><div>${idHtml}${alertaFaltaPrevisaoHtml}</div><span>${dOpen}</span></div>
                         <div class="card-client"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:4px; opacity:0.6;"></i>${municipio}</div>
                         <div class="card-summary">${resumo.substring(0, 75)}${resumo.length > 75 ? '...' : ''}</div>
-                        ${prevHtml}
+                        ${footerDateHtml}
                         <div class="card-footer-row"><span class="card-responsible"><i class="fa-regular fa-user"></i> ${responsavel || '<em>Sem resp.</em>'}</span><span class="card-days ${dias>30?'danger':(dias>15?'warn':'ok')}">${dias}d</span></div>
                     `;
                     cardElement.addEventListener('click', () => openSidebarDetails(row));
@@ -1754,7 +1748,7 @@
                 {key:'status', label:'Status'}, 
                 {key:'dias_aberto', label:'Dias'}, 
                 {key:'data_abertura', label:'Abertura'},
-                {key:'previsao_solucao', label:'Previsão Solução'}
+                {key:'previsao_solucao', label:'Previsão / Conclusão'}
             ];
             cols.forEach(c => {
                 let th = document.createElement('th'); th.innerText = c.label;
@@ -1795,21 +1789,24 @@
                 let dOp = rD instanceof Date ? rD.toLocaleDateString('pt-BR') : (rD || '-');
                 
                 let rP = getMappedValue(row, 'previsao_solucao');
-                let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '-');
+                let rC = getMappedValue(row, 'data_conclusao');
                 
-                // CORREÇÃO: Lógica segura para verificar se a previsão de fechamento está vencida na Tabela
-                let iconeVencidoTabela = '';
-                if (!isStatusConcluido(st) && rP) {
+                let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '-');
+                let dConcl = rC instanceof Date ? rC.toLocaleDateString('pt-BR') : (rC || '-');
+                
+                let campoDataTabela = dPrev;
+                if (isStatusConcluido(st)) {
+                    campoDataTabela = `<span style="color: var(--success); font-weight:700;">🏁 ${dConcl !== '-' ? dConcl : dOp}</span>`;
+                } else if (rP) {
                     const dataPrevista = parseSafeDate(rP);
                     const hoje = new Date();
                     hoje.setHours(0,0,0,0);
                     if (dataPrevista && dataPrevista.getTime() !== 0 && dataPrevista < hoje) {
-                        iconeVencidoTabela = '⛔ ';
+                        campoDataTabela = '⛔ ' + dPrev;
                     }
                 }
                 
                 const style = getStatusStyle(st);
-
                 const idHtml = id !== '-' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" style="text-decoration: none; color: var(--primary); font-weight: 700;" onclick="event.stopPropagation();">${id}</a>` : '-';
 
                 tr.innerHTML = `
@@ -1821,7 +1818,7 @@
                     <td><span class="badge" style="background-color:${style.bg}; color:${style.text}; border: 1px solid ${style.border};">${st}</span></td>
                     <td style="font-weight:700; color: ${dias > 30 ? 'var(--danger)' : 'inherit'};">${dias}d</td>
                     <td>${dOp}</td>
-                    <td style="font-weight:600;">${iconeVencidoTabela}${dPrev}</td>
+                    <td style="font-weight:600;">${campoDataTabela}</td>
                 `;
                 tr.addEventListener('click', () => openSidebarDetails(row)); tbody.appendChild(tr);
             });
@@ -1833,7 +1830,7 @@
                 { title: 'Informações Gerais do Chamado', fields: [{ label: 'Número do Chamado (Chave)', key: 'id' }, { label: 'Vertical / BU', key: 'vertical' }, { label: 'Produto Vinculado', key: 'produto' }] },
                 { title: 'Dados de Identificação Regional', fields: [{ label: 'Município', key: 'cliente' }, { label: 'UF / Região', key: 'uf' }] },
                 { title: 'Responsável Técnico', fields: [{ label: 'Profissional Atribuído', key: 'responsavel' }] },
-                { title: 'Prazos e Cronologia', fields: [{ label: 'Data de Abertura (Criado)', key: 'data_abertura' }, { label: 'Prazo Limite / SLA', key: 'prazo' }, { label: 'Previsão de Solução', key: 'previsao_solucao' }, { label: 'Dias Correntes em Aberto', key: 'dias_aberto' }] },
+                { title: 'Prazos e Cronologia', fields: [{ label: 'Data de Abertura (Criado)', key: 'data_abertura' }, { label: 'Prazo Limite / SLA', key: 'prazo' }, { label: 'Previsão de Solução', key: 'previsao_solucao' }, { label: 'Data Resolvido (Fim)', key: 'data_conclusao' }, { label: 'Dias Correntes em Aberto', key: 'dias_aberto' }] },
                 { title: 'Situação Operacional', fields: [{ label: 'Status Atual', key: 'status' }, { label: 'Nível de Prioridade', key: 'prioridade' }] }
             ];
             cats.forEach(cat => {
@@ -1883,7 +1880,9 @@
                 'Responsável': getMappedValue(row, 'responsavel'), 'Prioridade': getMappedValue(row, 'prioridade'), 'Status': getMappedValue(row, 'status'),
                 'Vertical': getMappedValue(row, 'vertical'), 'Produto': getMappedValue(row, 'produto'), 'UF': getMappedValue(row, 'uf'),
                 'Data Abertura': getMappedValue(row, 'data_abertura') instanceof Date ? getMappedValue(row, 'data_abertura').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_abertura'),
+                'Data Abertura': getMappedValue(row, 'data_abertura') instanceof Date ? getMappedValue(row, 'data_abertura').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_abertura'),
                 'Previsão de Solução': getMappedValue(row, 'previsao_solucao') instanceof Date ? getMappedValue(row, 'previsao_solucao').toLocaleDateString('pt-BR') : getMappedValue(row, 'previsao_solucao'),
+                'Data da Conclusão': getMappedValue(row, 'data_conclusao') instanceof Date ? getMappedValue(row, 'data_conclusao').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_conclusao'),
                 'Dias Aberto': getMappedValue(row, 'dias_aberto'), 'Observações': getMappedValue(row, 'observacoes')
             }));
             if (type === 'excel') {
