@@ -270,17 +270,17 @@
         }
 
         select.form-control {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    cursor: pointer !important;
-    
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important; /* CORRIGIDO AQUI */
-    background-position: right 14px center !important;
-    background-size: 11px !important;
-    padding-right: 40px !important;
-}
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            cursor: pointer !important;
+            
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 14px center !important;
+            background-size: 11px !important;
+            padding-right: 40px !important;
+        }
 
         body:not(.dark-mode) select.form-control {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e6c84' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
@@ -1052,6 +1052,10 @@
                     <label>UF</label>
                     <select id="filterUF" class="form-control"><option value="">Todos</option></select>
                 </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="filterType" class="form-control"><option value="">Todos</option></select>
+                </div>
             </div>
         </section>
 
@@ -1156,11 +1160,28 @@
         let currentSortColumn = '';
         let currentSortDirection = 'asc';
 
+        // Lista permitida oficial em caixa alta
+        const allowedParticipants = new Set([
+            "ADEMILSON ALEXANDRE", "ADIEL MATHIAS SILVESTRE", "ADILSON VITOR KREUSH FILHO",
+            "ALEX ROSSANO PRESTES DA SILVA", "ANA AMARA FARIAS BARBOSA", "BRENO JESUS MATHEUS DE OLIVEIRA",
+            "BRUNO ALVES DE SA", "GERALDO FERNANDO DE MIRANDA", "CAINA MORENO RIGONI",
+            "CARLOS ALEXANDRE SOARES", "CARLOS HENRIQUE CENACHI FERREIRA", "DAIANE ALEXANDRE PESCADOR",
+            "DIEGO LEANDRO FERREIRA REIS", "FERNANDA DAMIANI PEREIRA", "FLAVIO JUNIO LACERDA",
+            "ICARO SAVIOTTI SILVA", "IVANA ANTONIA QUEIROZ BELANDRINO", "JEAN AUGUSTO SOARES DE OLIVEIRA",
+            "JOSE FABIO FORMIGA DA SILVA", "JOSEMAR MARCOS DE MELO", "JULIA PAVANELLO",
+            "KATIRI BARDINI MARCELINO", "KATRYN HOFFMANN DE MELLO", "MARCELO RODRIGUES ALVES DE OLIVEIRA",
+            "MARCOS VINICIUS DA SILVA CRUZ", "MICHEL CHAGAS DA COSTA", "MURILO HENRIQUE FERNANDES",
+            "ODAIR JOSE STRAPASSOLLI", "PEDRO HENRIQUE FLORES DUTRA", "RAFAEL ANGELONI CURI",
+            "RAFAELA SANTOS AMARAL", "RICARDO FIGUEIREDO FELISBERTO", "ROBERTO LIMA SENRA",
+            "RONI BREHMER", "VICTOR DE SOUZA OLIVEIRA", "WARLEY MUCI ABDONUR",
+            "WILLIAM FERNANDES JOAQUIM"
+        ]);
+
         const fieldMapping = {
             id: ['chave', 'key', 'chamado', 'id', 'ticket', 'numero', 'número', 'codigo', 'código', 'id do chamado', 'incident', 'nº'],
             cliente: ['município', 'municipio', 'cidade', 'localidade', 'cliente', 'empresa', 'razão social', 'razao_social', 'client', 'nome do cliente', 'solicitante'],
-            resumo: ['resumo', 'assunto', 'descrição', 'descricao', 'titulo', 'título', 'summary', 'descrição curta', 'breve descrição'],
-            responsavel: ['responsável', 'responsavel', 'tecnico', 'técnico', 'analista', 'owner', 'assigned', 'atribuído a', 'operador'],
+            resumo: ['resumo', 'assunto', 'descrição', 'descricao', 'titulo', 'título', 'summary', 'descrição corta', 'breve descrição'],
+            responsavel: ['responsável', 'responsavel', 'tecnico', 'técnico', 'analista', 'owner', 'assigned', 'atribuído a', 'operador', 'request participants'],
             prioridade: ['prioridade', 'criticidade', 'priority', 'urgência', 'escala'],
             status: ['status', 'situação', 'situacao', 'estado', 'fase', 'estágio', 'status atual'],
             vertical: ['vertical', 'segmento', 'setor', 'área', 'area', 'business unit', 'bu'],
@@ -1171,7 +1192,33 @@
             dias_aberto: ['dias em aberto', 'dias_aberto', 'dias', 'tempo em aberto', 'age', 'dias decorridos', 'atraso'],
             observacoes: ['observações', 'observacoes', 'notas', 'comentários', 'comentarios', 'descrição detalhada', 'histórico', 'detalhes'],
             previsao_solucao: ['previsão de solução', 'previsao de solucao', 'previsão', 'previsao', 'data previsão', 'data previsao', 'solução estimada', 'resolução', 'data da resolucao'],
-            data_conclusao: ['data resolvido', 'resolvido', 'concluído em', 'concluido em', 'data da conclusão', 'data fechamento']
+            data_conclusao: ['data resolvido', 'resolvido', 'concluído em', 'concluido em', 'data da conclusão', 'data fechamento'],
+            tipo: ['tipo', 'type', 'tipo do chamado', 'tipo de chamado', 'issue type', 'tipo de ticket']
+        };
+
+        // Função utilitária para extrair e limpar todos os nomes de uma string de responsáveis/participantes
+        const extractAndCleanNames = (rawString) => {
+            if (!rawString) return [];
+            // Quebra por vírgula ou por quebra de linha
+            let rawTokens = rawString.toString().split(/[\n\r,]+/);
+            let validNames = [];
+            
+            rawTokens.forEach(token => {
+                let cleaned = token.trim().toUpperCase().replace(/\s+/g, ' ');
+                if (!cleaned) return;
+
+                let matchedName = "";
+                for (let allowed of allowedParticipants) {
+                    if (cleaned === allowed || allowed.includes(cleaned) || cleaned.includes(allowed)) {
+                        matchedName = allowed;
+                        break;
+                    }
+                }
+                if (matchedName) {
+                    validNames.push(matchedName);
+                }
+            });
+            return validNames;
         };
 
         const isSemResponsavel = (respStr) => {
@@ -1270,13 +1317,26 @@
             const aliases = fieldMapping[fieldKey];
             if (!aliases) return '';
             const rowKeys = Object.keys(row);
+            
             for (let alias of aliases) {
                 let match = rowKeys.find(k => k.toLowerCase().trim() === alias.toLowerCase().trim());
-                if (match) return row[match];
+                if (match && row[match] !== undefined && row[match] !== null && row[match].toString().trim() !== '') {
+                    return row[match];
+                }
             }
+            
+            if (fieldKey === 'responsavel') {
+                let participantMatch = rowKeys.find(k => k.toLowerCase().trim() === 'request participants');
+                if (participantMatch && row[participantMatch] !== undefined && row[participantMatch] !== null && row[participantMatch].toString().trim() !== '') {
+                    return row[participantMatch];
+                }
+            }
+
             for (let alias of aliases) {
                 let match = rowKeys.find(k => k.toLowerCase().includes(alias.toLowerCase()));
-                if (match) return row[match];
+                if (match && row[match] !== undefined && row[match] !== null && row[match].toString().trim() !== '') {
+                    return row[match];
+                }
             }
             return '';
         };
@@ -1290,7 +1350,7 @@
             document.getElementById('fileInput').addEventListener('change', handleFileUpload);
             document.getElementById('refreshBtn').addEventListener('click', applyFiltersAndRefresh);
 
-            const filters = ['filterSearch', 'filterClient', 'filterResponsible', 'filterStatus', 'filterPriority', 'filterProduct', 'filterUF'];
+            const filters = ['filterSearch', 'filterClient', 'filterResponsible', 'filterStatus', 'filterPriority', 'filterProduct', 'filterUF', 'filterType'];
             filters.forEach(id => document.getElementById(id).addEventListener('input', applyFiltersAndRefresh));
             
             document.getElementById('filterWithResponsible').addEventListener('change', applyFiltersAndRefresh);
@@ -1421,7 +1481,8 @@
             const dropdownConfigs = [
                 { id: 'filterClient', key: 'cliente' }, { id: 'filterResponsible', key: 'responsavel' },
                 { id: 'filterStatus', key: 'status' }, { id: 'filterPriority', key: 'prioridade' },
-                { id: 'filterProduct', key: 'produto' }, { id: 'filterUF', key: 'uf' }
+                { id: 'filterProduct', key: 'produto' }, { id: 'filterUF', key: 'uf' },
+                { id: 'filterType', key: 'tipo' }
             ];
             
             dropdownConfigs.forEach(conf => {
@@ -1429,10 +1490,25 @@
                 if (!selectElement) return;
                 selectElement.innerHTML = '<option value="">Todos</option>';
                 let uniqueValues = new Set();
+                
                 rawDataGlobal.forEach(row => {
-                    let val = getMappedValue(row, conf.key);
-                    if (val !== undefined && val !== null && val !== '') uniqueValues.add(val.toString().trim());
+                    if (conf.key === 'responsavel') {
+                        const rowKeys = Object.keys(row);
+                        
+                        const aliases = fieldMapping['responsavel'];
+                        for (let alias of aliases) {
+                            let match = rowKeys.find(k => k.toLowerCase().trim() === alias.toLowerCase().trim());
+                            if (match && row[match] !== undefined && row[match] !== null) {
+                                let extracted = extractAndCleanNames(row[match]);
+                                extracted.forEach(name => uniqueValues.add(name));
+                            }
+                        }
+                    } else {
+                        let val = getMappedValue(row, conf.key);
+                        if (val !== undefined && val !== null && val !== '') uniqueValues.add(val.toString().trim().toUpperCase());
+                    }
                 });
+                
                 Array.from(uniqueValues).sort().forEach(val => {
                     let opt = document.createElement('option'); opt.value = val; opt.innerText = val; selectElement.appendChild(opt);
                 });
@@ -1444,7 +1520,7 @@
                 let uniqueValues = new Set();
                 rawDataGlobal.forEach(row => {
                     let val = getMappedValue(row, 'vertical');
-                    if (val !== undefined && val !== null && val !== '') uniqueValues.add(val.toString().trim());
+                    if (val !== undefined && val !== null && val !== '') uniqueValues.add(val.toString().trim().toUpperCase());
                 });
                 
                 Array.from(uniqueValues).sort().forEach(val => {
@@ -1490,33 +1566,50 @@
 
         const applyFiltersAndRefresh = () => {
             const searchText = document.getElementById('filterSearch').value.toLowerCase().trim();
-            const clientVal = document.getElementById('filterClient').value;
-            const respVal = document.getElementById('filterResponsible').value;
-            const statusVal = document.getElementById('filterStatus').value;
-            const prioVal = document.getElementById('filterPriority').value;
-            const prodVal = document.getElementById('filterProduct').value;
-            const ufVal = document.getElementById('filterUF').value;
+            const clientVal = document.getElementById('filterClient').value.toUpperCase();
+            const respVal = document.getElementById('filterResponsible').value.toUpperCase();
+            const statusVal = document.getElementById('filterStatus').value.toUpperCase();
+            const prioVal = document.getElementById('filterPriority').value.toUpperCase();
+            const prodVal = document.getElementById('filterProduct').value.toUpperCase();
+            const ufVal = document.getElementById('filterUF').value.toUpperCase();
+            const typeVal = document.getElementById('filterType').value.toUpperCase();
             const withRespOnly = document.getElementById('filterWithResponsible').checked;
             
             const checkboxes = document.querySelectorAll('#verticalPanel input[type="checkbox"]');
-            const selectedVerticals = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+            const selectedVerticals = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value.toUpperCase());
 
             filteredDataGlobal = rawDataGlobal.filter(row => {
-                if (withRespOnly && isSemResponsavel(getMappedValue(row, 'responsavel'))) return false;
+                let currentResp = getMappedValue(row, 'responsavel');
+                if (withRespOnly && isSemResponsavel(currentResp)) return false;
 
                 if (searchText) {
                     let matchText = Object.values(row).some(v => v && v.toString().toLowerCase().includes(searchText));
                     if (!matchText) return false;
                 }
-                if (clientVal && getMappedValue(row, 'cliente').toString().trim() !== clientVal) return false;
-                if (respVal && getMappedValue(row, 'responsavel').toString().trim() !== respVal) return false;
-                if (statusVal && getMappedValue(row, 'status').toString().trim() !== statusVal) return false;
-                if (prioVal && getMappedValue(row, 'prioridade').toString().trim() !== prioVal) return false;
-                if (prodVal && getMappedValue(row, 'produto').toString().trim() !== prodVal) return false;
-                if (ufVal && getMappedValue(row, 'uf').toString().trim() !== ufVal) return false;
+                if (clientVal && getMappedValue(row, 'cliente').toString().trim().toUpperCase() !== clientVal) return false;
+                
+                if (respVal) {
+                    let rowKeys = Object.keys(row);
+                    let rowNames = [];
+                    
+                    const aliases = fieldMapping['responsavel'];
+                    for (let alias of aliases) {
+                        let m = rowKeys.find(k => k.toLowerCase().trim() === alias.toLowerCase().trim());
+                        if (m && row[m] !== undefined && row[m] !== null) {
+                            rowNames.push(...extractAndCleanNames(row[m]));
+                        }
+                    }
+                    if (!rowNames.includes(respVal)) return false;
+                }
+                
+                if (statusVal && getMappedValue(row, 'status').toString().trim().toUpperCase() !== statusVal) return false;
+                if (prioVal && getMappedValue(row, 'prioridade').toString().trim().toUpperCase() !== prioVal) return false;
+                if (prodVal && getMappedValue(row, 'produto').toString().trim().toUpperCase() !== prodVal) return false;
+                if (ufVal && getMappedValue(row, 'uf').toString().trim().toUpperCase() !== ufVal) return false;
+                if (typeVal && getMappedValue(row, 'tipo').toString().trim().toUpperCase() !== typeVal) return false;
                 
                 if (selectedVerticals.length > 0) {
-                    let rVert = getMappedValue(row, 'vertical').toString().trim();
+                    let rVert = getMappedValue(row, 'vertical').toString().trim().toUpperCase();
                     if (!selectedVerticals.includes(rVert)) return false;
                 }
                 
@@ -1536,8 +1629,13 @@
             filteredDataGlobal.forEach(row => {
                 const status = (getMappedValue(row, 'status') || '').toString().trim();
                 const dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
-                if (getMappedValue(row, 'cliente')) uniqueClients.add(getMappedValue(row, 'cliente').toString().trim());
-                if (getMappedValue(row, 'responsavel')) uniqueStaff.add(getMappedValue(row, 'responsavel').toString().trim());
+                if (getMappedValue(row, 'cliente')) uniqueClients.add(getMappedValue(row, 'cliente').toString().trim().toUpperCase());
+                
+                let resp = getMappedValue(row, 'responsavel');
+                if (resp) {
+                    let names = extractAndCleanNames(resp);
+                    names.forEach(n => uniqueStaff.add(n));
+                }
 
                 if (isStatusConcluido(status)) {
                     concluidos++;
@@ -1640,8 +1738,13 @@
                 colCardsData.forEach(row => {
                     const id = getMappedValue(row, 'id') || '#ID';
                     const municipio = getMappedValue(row, 'cliente') || 'Não Informado';
-                    const resumo = getMappedValue(row, 'resumo') || 'Sem resumo.';
-                    const responsavel = getMappedValue(row, 'responsavel') || 'Não Atribuído';
+                    const sistema = getMappedValue(row, 'produto') || 'Não Informado';
+                    const tipoChamado = (getMappedValue(row, 'tipo') || '').toString().trim().toLowerCase();
+                    const resume = getMappedValue(row, 'resumo') || 'Sem resumo.';
+                    
+                    let responsavelRaw = getMappedValue(row, 'responsavel') || 'Não Atribuído';
+                    let responsavelClean = extractAndCleanNames(responsavelRaw).join(', ');
+
                     const prioridade = (getMappedValue(row, 'prioridade') || 'Baixa').toString().trim();
                     const dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
                     
@@ -1672,8 +1775,13 @@
                     let isAtrasado = (colName !== 'Done' && dias > 30);
 
                     let alertaFaltaPrevisaoHtml = '';
-                    if (colName !== 'Done' && !isSemResponsavel(responsavel) && !dPrev) {
+                    if (colName !== 'Done' && !isSemResponsavel(responsavelRaw) && !dPrev) {
                         alertaFaltaPrevisaoHtml = `<i class="fa-solid fa-triangle-exclamation" style="color: var(--warning); margin-left: 6px;" title="Alerta: Ticket com responsável atribuído, mas sem previsão de solução!"></i>`;
+                    }
+
+                    let tagImplantacaoHtml = '';
+                    if (tipoChamado === 'implantação' || tipoChamado === 'implantacao') {
+                        tagImplantacaoHtml = `<div class="card-client" style="background: var(--success-light); color: var(--success); border: 1px solid var(--success);"><i class="fa-solid fa-rocket" style="font-size:10px; margin-right:4px;"></i>IMPLANTAÇÃO</div>`;
                     }
 
                     const idHtml = id !== '#ID' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" class="card-id" style="text-decoration: none; color: var(--primary);" onclick="event.stopPropagation();">${id}</a>` : `<span>${id}</span>`;
@@ -1682,10 +1790,14 @@
                     cardElement.className = `kanban-card ${prioClass} ${isAtrasado ? 'card-atrasado' : ''}`;
                     cardElement.innerHTML = `
                         <div class="card-header-row"><div>${idHtml}${alertaFaltaPrevisaoHtml}</div><span>${dOpen}</span></div>
-                        <div class="card-client"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:4px; opacity:0.6;"></i>${municipio}</div>
-                        <div class="card-summary">${resumo.substring(0, 75)}${resumo.length > 75 ? '...' : ''}</div>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <div class="card-client"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:4px; opacity:0.6;"></i>${municipio.toUpperCase()}</div>
+                            <div class="card-client" style="background: var(--primary-light); color: var(--primary);"><i class="fa-solid fa-laptop-code" style="font-size:10px; margin-right:4px; opacity:0.6;"></i>${sistema.toUpperCase()}</div>
+                            ${tagImplantacaoHtml}
+                        </div>
+                        <div class="card-summary" style="margin-top: 4px;">${resume.substring(0, 75)}${resume.length > 75 ? '...' : ''}</div>
                         ${footerDateHtml}
-                        <div class="card-footer-row"><span class="card-responsible"><i class="fa-regular fa-user"></i> ${responsavel || '<em>Sem resp.</em>'}</span><span class="card-days ${dias>30?'danger':(dias>15?'warn':'ok')}">${dias}d</span></div>
+                        <div class="card-footer-row"><span class="card-responsible" title="${responsavelClean}"><i class="fa-regular fa-user"></i> ${responsavelClean}</span><span class="card-days ${dias>30?'danger':(dias>15?'warn':'ok')}">${dias}d</span></div>
                     `;
                     cardElement.addEventListener('click', () => openSidebarDetails(row));
                     cardsContainer.appendChild(cardElement);
@@ -1705,32 +1817,41 @@
                 scales:{ x:{ ticks:{ color:txtColor }, grid:{ color:gridColor } }, y:{ ticks:{ color:txtColor }, grid:{ color:gridColor }, beginAtZero:true } }
             });
 
-            let stC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'status') || 'Não Informado'; stC[v] = (stC[v]||0)+1; });
+            let stC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'status') || 'Não Informado'; v = v.toUpperCase(); stC[v] = (stC[v]||0)+1; });
             chartInstances['status'] = new Chart(document.getElementById('chartStatus'), { type:'bar', data:{ labels:Object.keys(stC), datasets:[{ data:Object.values(stC), backgroundColor:palette }] }, options:optFactory('x') });
 
-            let rsC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'responsavel') || 'Não Atribuído'; rsC[v] = (rsC[v]||0)+1; });
+            let rsC = {}; filteredDataGlobal.forEach(r => { 
+                let rawResp = getMappedValue(r, 'responsavel') || 'Não Atribuído';
+                let names = extractAndCleanNames(rawResp);
+                if (names.length === 0) names = ['NÃO ATRIBUÍDO'];
+                names.forEach(n => { rsC[n] = (rsC[n]||0)+1; });
+            });
             chartInstances['resp'] = new Chart(document.getElementById('chartResponsible'), { type:'bar', data:{ labels:Object.keys(rsC), datasets:[{ data:Object.values(rsC), backgroundColor:palette[0] }] }, options:optFactory('y') });
 
-            let clC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'cliente') || 'Não Informado'; clC[v] = (clC[v]||0)+1; });
+            let clC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'cliente') || 'Não Informado'; v = v.toUpperCase(); clC[v] = (clC[v]||0)+1; });
             let topCl = Object.entries(clC).sort((a,b)=>b[1]-a[1]).slice(0,10);
             chartInstances['client'] = new Chart(document.getElementById('chartClient'), { type:'bar', data:{ labels:topCl.map(e=>e[0]), datasets:[{ data:topCl.map(e=>e[1]), backgroundColor:palette[4] }] }, options:optFactory('x') });
 
-            let prC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'produto') || 'Outros'; prC[v] = (prC[v]||0)+1; });
+            let prC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'produto') || 'Outros'; v = v.toUpperCase(); prC[v] = (prC[v]||0)+1; });
             chartInstances['product'] = new Chart(document.getElementById('chartProduct'), { type:'doughnut', data:{ labels:Object.keys(prC), datasets:[{ data:Object.values(prC), backgroundColor:palette }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, position:'right', labels:{ color:txtColor } } } } });
 
             let dtC = {}; filteredDataGlobal.forEach(r => { let raw = getMappedValue(r, 'data_abertura'); let k = raw instanceof Date ? raw.toLocaleDateString('pt-BR') : (raw || 'Sem Data').toString().trim(); dtC[k] = (dtC[k]||0)+1; });
             let sDates = Object.keys(dtC).sort((a,b)=>parseSafeDate(a)-parseSafeDate(b));
             chartInstances['date'] = new Chart(document.getElementById('chartDate'), { type:'line', data:{ labels:sDates, datasets:[{ data:sDates.map(k=>dtC[k]), borderColor:'rgba(0,184,217,1)', tension:0.2, fill:true, backgroundColor:'rgba(0,184,217,0.1)' }] }, options:optFactory('x') });
 
-            let pcC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'prioridade') || 'Baixa'; pcC[v] = (pcC[v]||0)+1; });
+            let pcC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'prioridade') || 'Baixa'; v = v.toUpperCase(); pcC[v] = (pcC[v]||0)+1; });
             chartInstances['priority'] = new Chart(document.getElementById('chartPriority'), { type:'pie', data:{ labels:Object.keys(pcC), datasets:[{ data:Object.values(pcC), backgroundColor:['#ff5630','#ffab00','#36b37e'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, position:'left', labels:{ color:txtColor } } } } });
 
             let tmR = {}; filteredDataGlobal.forEach(r => {
-                let resp = getMappedValue(r, 'responsavel') || 'Não Atribuído';
-                let st = (getMappedValue(r, 'status') || '').toString().trim();
+                let rawResp = getMappedValue(r, 'responsavel') || 'Não Atribuído';
+                let status = (getMappedValue(r, 'status') || '').toString().trim();
                 let dias = parseInt(getMappedValue(r, 'dias_aberto')) || 0;
-                if (!isStatusConcluido(st)) {
-                    if(!tmR[resp]) tmR[resp] = { t:0, c:0 }; tmR[resp].t += dias; tmR[resp].c++;
+                if (!isStatusConcluido(status)) {
+                    let names = extractAndCleanNames(rawResp);
+                    if (names.length === 0) names = ['NÃO ATRIBUÍDO'];
+                    names.forEach(resp => {
+                        if(!tmR[resp]) tmR[resp] = { t:0, c:0 }; tmR[resp].t += dias; tmR[resp].c++;
+                    });
                 }
             });
             let labelsA = [], valuesA = []; Object.entries(tmR).forEach(([n,o])=>{ labelsA.push(n); valuesA.push(Math.round(o.t/o.c)||0); });
@@ -1782,7 +1903,7 @@
                 let tr = document.createElement('tr');
                 let id = getMappedValue(row, 'id') || '-';
                 let prio = (getMappedValue(row, 'prioridade') || 'Baixa').toString().trim();
-                let st = (getMappedValue(row, 'status') || 'Aberto').toString().trim();
+                let status = (getMappedValue(row, 'status') || 'Aberto').toString().trim();
                 let dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
                 
                 let rD = getMappedValue(row, 'data_abertura'); 
@@ -1795,7 +1916,7 @@
                 let dConcl = rC instanceof Date ? rC.toLocaleDateString('pt-BR') : (rC || '-');
                 
                 let campoDataTabela = dPrev;
-                if (isStatusConcluido(st)) {
+                if (isStatusConcluido(status)) {
                     campoDataTabela = `<span style="color: var(--success); font-weight:700;">🏁 ${dConcl !== '-' ? dConcl : dOp}</span>`;
                 } else if (rP) {
                     const dataPrevista = parseSafeDate(rP);
@@ -1806,16 +1927,19 @@
                     }
                 }
                 
-                const style = getStatusStyle(st);
+                const style = getStatusStyle(status);
                 const idHtml = id !== '-' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" style="text-decoration: none; color: var(--primary); font-weight: 700;" onclick="event.stopPropagation();">${id}</a>` : '-';
+
+                let respRaw = getMappedValue(row, 'responsavel') || 'Não Atribuído';
+                let respClean = extractAndCleanNames(respRaw).join(', ');
 
                 tr.innerHTML = `
                     <td style="font-weight:700;">${idHtml}</td>
-                    <td style="font-weight:600;"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:6px; opacity:0.4;"></i>${getMappedValue(row, 'cliente')||'-'}</td>
+                    <td style="font-weight:600;"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:6px; opacity:0.4;"></i>${getMappedValue(row, 'cliente').toString().toUpperCase()||'-'}</td>
                     <td title="${getMappedValue(row, 'resumo')}">${getMappedValue(row, 'resumo')||'-'}</td>
-                    <td>${getMappedValue(row, 'responsavel') || '<em>Não Atribuído</em>'}</td>
-                    <td><span class="badge badge-${prio.toLowerCase().replace('é','e')}">${prio}</span></td>
-                    <td><span class="badge" style="background-color:${style.bg}; color:${style.text}; border: 1px solid ${style.border};">${st}</span></td>
+                    <td title="${respClean}">${respClean}</td>
+                    <td><span class="badge badge-${prio.toLowerCase().replace('é','e')}">${prio.toUpperCase()}</span></td>
+                    <td><span class="badge" style="background-color:${style.bg}; color:${style.text}; border: 1px solid ${style.border};">${status.toUpperCase()}</span></td>
                     <td style="font-weight:700; color: ${dias > 30 ? 'var(--danger)' : 'inherit'};">${dias}d</td>
                     <td>${dOp}</td>
                     <td style="font-weight:600;">${campoDataTabela}</td>
@@ -1827,7 +1951,7 @@
         const openSidebarDetails = (row) => {
             const container = document.getElementById('sidebarFieldsContainer'); container.innerHTML = '';
             const cats = [
-                { title: 'Informações Gerais do Chamado', fields: [{ label: 'Número do Chamado (Chave)', key: 'id' }, { label: 'Vertical / BU', key: 'vertical' }, { label: 'Produto Vinculado', key: 'produto' }] },
+                { title: 'Informações Gerais do Chamado', fields: [{ label: 'Número do Chamado (Chave)', key: 'id' }, { label: 'Vertical / BU', key: 'vertical' }, { label: 'Produto Vinculado', key: 'produto' }, { label: 'Tipo de Ticket', key: 'tipo' }] },
                 { title: 'Dados de Identificação Regional', fields: [{ label: 'Município', key: 'cliente' }, { label: 'UF / Região', key: 'uf' }] },
                 { title: 'Responsável Técnico', fields: [{ label: 'Profissional Atribuído', key: 'responsavel' }] },
                 { title: 'Prazos e Cronologia', fields: [{ label: 'Data de Abertura (Criado)', key: 'data_abertura' }, { label: 'Prazo Limite / SLA', key: 'prazo' }, { label: 'Previsão de Solução', key: 'previsao_solucao' }, { label: 'Data Resolvido (Fim)', key: 'data_conclusao' }, { label: 'Dias Correntes em Aberto', key: 'dias_aberto' }] },
@@ -1839,6 +1963,11 @@
                 let grid = document.createElement('div'); grid.className = 'detail-grid';
                 cat.fields.forEach(f => {
                     let v = getMappedValue(row, f.key); if (v instanceof Date) v = v.toLocaleDateString('pt-BR');
+                    if (f.key === 'responsavel' && v) {
+                        v = extractAndCleanNames(v).join('<br>');
+                    } else if (v && f.key !== 'id' && f.key !== 'prazo' && f.key !== 'data_abertura' && f.key !== 'previsao_solucao' && f.key !== 'data_conclusao') {
+                        v = v.toString().toUpperCase();
+                    }
                     if (!v && v !== 0) v = '<em>Não Informado</em>';
                     grid.innerHTML += `<div class="detail-item"><span class="detail-label">${f.label}</span><span class="detail-value">${v}</span></div>`;
                 });
@@ -1876,10 +2005,10 @@
         window.exportTable = (type) => {
             if (filteredDataGlobal.length === 0) return;
             const exportData = filteredDataGlobal.map(row => ({
-                'Chamado (Chave)': getMappedValue(row, 'id'), 'Município': getMappedValue(row, 'cliente'), 'Resumo': getMappedValue(row, 'resumo'),
-                'Responsável': getMappedValue(row, 'responsavel'), 'Prioridade': getMappedValue(row, 'prioridade'), 'Status': getMappedValue(row, 'status'),
-                'Vertical': getMappedValue(row, 'vertical'), 'Produto': getMappedValue(row, 'produto'), 'UF': getMappedValue(row, 'uf'),
-                'Data Abertura': getMappedValue(row, 'data_abertura') instanceof Date ? getMappedValue(row, 'data_abertura').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_abertura'),
+                'Chamado (Chave)': getMappedValue(row, 'id'), 'Município': getMappedValue(row, 'cliente').toString().toUpperCase(), 'Resumo': getMappedValue(row, 'resumo'),
+                'Responsável': extractAndCleanNames(getMappedValue(row, 'responsavel')).join(', '), 'Prioridade': getMappedValue(row, 'prioridade').toString().toUpperCase(), 'Status': getMappedValue(row, 'status').toString().toUpperCase(),
+                'Vertical': getMappedValue(row, 'vertical').toString().toUpperCase(), 'Produto': getMappedValue(row, 'produto').toString().toUpperCase(), 'UF': getMappedValue(row, 'uf').toString().toUpperCase(),
+                'Tipo': getMappedValue(row, 'tipo').toString().toUpperCase(),
                 'Data Abertura': getMappedValue(row, 'data_abertura') instanceof Date ? getMappedValue(row, 'data_abertura').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_abertura'),
                 'Previsão de Solução': getMappedValue(row, 'previsao_solucao') instanceof Date ? getMappedValue(row, 'previsao_solucao').toLocaleDateString('pt-BR') : getMappedValue(row, 'previsao_solucao'),
                 'Data da Conclusão': getMappedValue(row, 'data_conclusao') instanceof Date ? getMappedValue(row, 'data_conclusao').toLocaleDateString('pt-BR') : getMappedValue(row, 'data_conclusao'),
