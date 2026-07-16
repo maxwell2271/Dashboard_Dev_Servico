@@ -9,13 +9,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
-        /* Variáveis de Tema (Light Mode Padrão) */
+        /* -------------------------------------------------------------------------
+           DESIGN SYSTEM TOKENS & CONFIGURATIONS
+        ------------------------------------------------------------------------- */
         :root {
             --bg-app: #f4f5f7;
             --bg-card: #ffffff;
             --bg-sidebar: #ffffff;
             --text-primary: #172b4d;
             --text-secondary: #5e6c84;
+            --text-muted: #8993a4;
             --border-color: #dfe1e6;
             --primary: #0052cc;
             --primary-hover: #0065ff;
@@ -28,44 +31,49 @@
             --danger-light: #ffebe6;
             --info: #00b8d9;
             --info-light: #e6fcff;
-            --shadow-sm:0 1px 3px rgba(9,30,66,0.13), 0 0 1px rgba(9,30,66,0.2);
+            --shadow-sm: 0 1px 3px rgba(9,30,66,0.13), 0 0 1px rgba(9,30,66,0.2);
             --shadow-md: 0 4px 8px -2px rgba(9,30,66,0.25), 0 0 1px rgba(9,30,66,0.31);
             --radius-sm: 4px;
             --radius-md: 8px;
             --radius-lg: 12px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             --kanban-column-bg: #ebecf0;
+
+            /* Card Component Specific Tokens (Optimized for 14" Screens) */
+            --card-radius: 6px;
+            --card-gap: 6px;
         }
 
-        /* Variáveis Dark Mode */
+        /* Tema Dark Mode Premium (Navy/Deep Blue do Layout) */
         body.dark-mode {
-            --bg-app: #0f172a;
-            --bg-card: #1e293b;
-            --bg-sidebar: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-            --primary: #38bdf8;
-            --primary-hover: #7dd3fc;
-            --primary-light: rgba(56, 189, 248, 0.15);
+            --bg-app: #09111e;
+            --bg-card: #111c30;
+            --bg-sidebar: #111c30;
+            --text-primary: #ffffff;
+            --text-secondary: #a2b4c7;
+            --text-muted: #607d8b;
+            --border-color: #1d2d44;
+            --primary: #00a8ff;
+            --primary-hover: #33bfff;
+            --primary-light: rgba(0, 168, 255, 0.08);
             --success: #10b981;
-            --success-light: rgba(16, 185, 129, 0.15);
+            --success-light: rgba(16, 185, 129, 0.08);
             --warning: #f59e0b;
-            --warning-light: rgba(245, 158, 11, 0.15);
+            --warning-light: rgba(245, 158, 11, 0.08);
             --danger: #ef4444;
-            --danger-light: rgba(239, 68, 68, 0.15);
-            --info: #06b6d4;
-            --info-light: rgba(6, 182, 212, 0.15);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-            --kanban-column-bg: #151f32;
+            --danger-light: rgba(239, 68, 68, 0.08);
+            --info: #00b4d8;
+            --info-light: rgba(0, 180, 216, 0.08);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 24px -4px rgba(0, 0, 0, 0.6), 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+            --kanban-column-bg: #0d1726;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
         }
 
         body {
@@ -78,11 +86,11 @@
             overflow-x: hidden;
         }
 
-        /* Cabeçalho */
+        /* Cabeçalho Compactado */
         header {
             background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
-            padding: 16px 24px;
+            padding: 10px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -92,24 +100,24 @@
         }
 
         .header-title-area h1 {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .header-title-area p {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
 
         /* Botões */
@@ -117,14 +125,14 @@
             background-color: var(--bg-app);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            font-size: 13px;
+            padding: 6px 10px;
+            font-size: 12px;
             font-weight: 600;
             border-radius: var(--radius-sm);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: var(--transition);
         }
 
@@ -145,35 +153,35 @@
 
         .btn-toggle-dark {
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 30px;
+            height: 30px;
             padding: 0;
             justify-content: center;
         }
 
-        /* Layout Geral */
+        /* Layout Geral Compactado */
         .container {
-            padding: 20px 24px;
+            padding: 12px 16px;
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 12px;
             max-width: 1600px;
             width: 100%;
             margin: 0 auto;
         }
 
-        /* Grid de Indicadores */
+        /* Grid de Indicadores Otimizado para 14" */
         .indicators-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
         }
 
         .indicator-card {
             background-color: var(--bg-card);
             border-radius: var(--radius-md);
-            padding: 16px;
+            padding: 10px 12px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
             display: flex;
@@ -186,7 +194,7 @@
         }
 
         .indicator-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             box-shadow: var(--shadow-md);
         }
 
@@ -195,7 +203,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
+            width: 3px;
             height: 100%;
             background-color: var(--primary);
         }
@@ -210,14 +218,14 @@
             justify-content: space-between;
             align-items: center;
             color: var(--text-secondary);
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .indicator-icon {
-            font-size: 18px;
+            font-size: 14px;
             opacity: 0.8;
         }
         .indicator-card.open .indicator-icon { color: var(--info); }
@@ -225,26 +233,26 @@
         .indicator-card.delayed .indicator-icon { color: var(--danger); }
 
         .indicator-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-top: 10px;
+            margin-top: 4px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         .form-group label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
         }
 
-        /* UNIFICAÇÃO ESTRUTURAL COMPLETA DOS FILTROS */
+        /* Unificação Estrutural dos Filtros */
         .form-control, 
         #verticalTrigger {
             display: flex !important;
@@ -255,13 +263,13 @@
             background-color: var(--bg-card) !important;
             color: var(--text-primary) !important;
             border: 1px solid var(--border-color) !important;
-            border-radius: 14px !important;
+            border-radius: 8px !important;
             
-            padding: 0 14px !important;
-            height: 42px !important;
-            line-height: 40px !important;
+            padding: 0 10px !important;
+            height: 32px !important;
+            line-height: 30px !important;
             
-            font-size: 13px !important;
+            font-size: 12px !important;
             font-weight: 500 !important;
             outline: none !important;
             width: 100% !important;
@@ -277,23 +285,24 @@
             
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
             background-repeat: no-repeat !important;
-            background-position: right 14px center !important;
-            background-size: 11px !important;
-            padding-right: 40px !important;
+            background-position: right 10px center !important;
+            background-size: 10px !important;
+            padding-right: 30px !important;
         }
 
         body:not(.dark-mode) select.form-control {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e6c84' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
         }
 
-        input[type="text"].form-control {
+        input[type="text"].form-control,
+        input[type="date"].form-control {
             line-height: normal !important;
         }
 
         select.form-control option {
             background-color: var(--bg-card) !important;
             color: var(--text-primary) !important;
-            padding: 10px !important;
+            padding: 8px !important;
         }
 
         .form-control:hover, 
@@ -306,29 +315,29 @@
         #verticalTrigger:focus-within,
         #verticalTrigger.open {
             border-color: var(--primary) !important;
-            box-shadow: 0 0 0 3px var(--primary-light) !important;
+            box-shadow: 0 0 0 2px var(--primary-light) !important;
         }
 
         /* Menu de Navegação por Abas */
         .nav-tabs {
             display: flex;
             border-bottom: 2px solid var(--border-color);
-            gap: 8px;
+            gap: 6px;
         }
 
         .tab-btn {
             background: none;
             border: none;
             color: var(--text-secondary);
-            padding: 10px 18px;
-            font-size: 14px;
+            padding: 8px 12px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             position: relative;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .tab-btn:hover {
@@ -362,9 +371,9 @@
         /* Visão Kanban */
         .kanban-board {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             overflow-x: auto;
-            padding-bottom: 12px;
+            padding-bottom: 8px;
             align-items: flex-start;
             min-height: 500px;
         }
@@ -372,18 +381,18 @@
         .kanban-column {
             background-color: var(--kanban-column-bg);
             border-radius: var(--radius-md);
-            min-width: 290px;
-            max-width: 360px;
+            min-width: 240px;
+            max-width: 290px;
             flex: 1;
             display: flex;
             flex-direction: column;
-            max-height: 75vh;
+            max-height: 72vh;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
         }
 
         .kanban-column-header {
-            padding: 12px 16px;
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -391,7 +400,7 @@
         }
 
         .kanban-column-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: var(--text-primary);
             text-transform: uppercase;
@@ -400,125 +409,198 @@
         .kanban-card-count {
             background-color: var(--border-color);
             color: var(--text-primary);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 1px 6px;
+            border-radius: 8px;
         }
 
         .kanban-cards {
-            padding: 12px;
+            padding: 8px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             overflow-y: auto;
             flex: 1;
         }
 
+        /* -------------------------------------------------------------------------
+           COMPONENTE: KANBAN CARD REDESENHADO (PERFECT HIGH-FIDELITY MATCH)
+        ------------------------------------------------------------------------- */
         .kanban-card {
             background-color: var(--bg-card);
-            border-radius: var(--radius-sm);
-            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 10px 12px;
             box-shadow: var(--shadow-sm);
-            border-left: 4px solid var(--border-color);
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            position: relative;
+            gap: var(--card-gap);
+            outline: none;
+            user-select: none;
         }
 
+        /* Micro-interação Hover & Foco */
         .kanban-card:hover {
-            transform: translateY(-2px);
+            border-color: var(--primary);
+            background-color: var(--bg-card);
+            transform: translateY(-1px);
             box-shadow: var(--shadow-md);
         }
 
-        .kanban-card.prio-alta { border-left-color: var(--danger); }
-        .kanban-card.prio-media { border-left-color: var(--warning); }
-        .kanban-card.prio-baixa { border-left-color: var(--success); }
-
-        .kanban-card.card-atrasado {
-            background-color: #ffebe6 !important;
-            border-right: 2px dashed var(--danger);
-        }
-        body.dark-mode .kanban-card.card-atrasado {
-            background-color: rgba(239, 68, 68, 0.2) !important;
+        .kanban-card:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light), var(--shadow-sm);
         }
 
-        .card-header-row {
+        /* Primeira Linha (Header) */
+        .card-row-top {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            align-items: center;
         }
 
         .card-id {
             color: var(--primary);
+            font-size: 11px;
             font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.3px;
         }
         
         .card-id:hover {
             text-decoration: underline !important;
         }
 
-        .card-client {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            background: rgba(9, 30, 66, 0.06);
-            padding: 3px 8px;
-            border-radius: var(--radius-sm);
-            align-self: flex-start;
-            letter-spacing: 0.3px;
+        .card-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
-        body.dark-mode .card-client {
-            background: rgba(255,255,255,0.1);
+        /* Linha Unificada (Cidade - Sistema) */
+        .card-pill-municipio {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+            padding: 2px 6px;
+            width: max-content;
+            max-width: 100%;
+        }
+
+        .card-pill-municipio i {
+            color: #a2b4c7;
+            font-size: 10px;
+        }
+
+        .card-pill-municipio span {
             color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
+        /* Título do Card (Breve Descrição / Resumo) - Case-Sensitive & Sem Negrito */
         .card-summary {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-primary);
-            line-height: 1.4;
+            font-size: 12px;
+            font-weight: 400; /* Removido o negrito conforme solicitado */
+            color: #ffffff;
+            line-height: 1.35;
+            margin: 2px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
         }
 
-        .card-footer-row {
+        /* Linha de Prazo / SLA */
+        .card-date-limit {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .card-date-limit i {
+            font-size: 11px;
+        }
+
+        /* Cores Atribuídas Semânticas */
+        .card-date-limit.neutral { color: var(--text-secondary); }
+        .card-date-limit.ok { color: #10b981; }
+        .card-date-limit.warn { color: #f59e0b; }
+        .card-date-limit.danger { color: #ef4444; }
+
+        /* Divisor minimalista */
+        .card-divider {
+            border: none;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 2px 0;
+            width: 100%;
+        }
+
+        /* Footer */
+        .card-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 6px;
+            height: 18px;
         }
 
-        .card-responsible {
-            font-weight: 600;
+        .card-resp-area {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 75%;
         }
 
-        .card-days {
+        .card-resp-area i {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* Badge de Dias */
+        .card-age-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1px 6px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 2px 6px;
             border-radius: 4px;
+            height: 16px;
         }
-        .card-days.ok { background-color: var(--success-light); color: var(--success); }
-        .card-days.warn { background-color: var(--warning-light); color: var(--warning); }
-        .card-days.danger { background-color: var(--danger-light); color: var(--danger); }
 
-        /* Visão Gráficos */
+        .card-age-badge.neutral { background-color: rgba(162, 180, 199, 0.1); color: var(--text-secondary); }
+        .card-age-badge.ok { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .card-age-badge.warn { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .card-age-badge.danger { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+        /* -------------------------------------------------------------------------
+           VISÕES E COMPONENTES ADICIONAIS
+        ------------------------------------------------------------------------- */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
         }
 
         @media (max-width: 600px) {
@@ -528,17 +610,17 @@
         .chart-card {
             background-color: var(--bg-card);
             border-radius: var(--radius-md);
-            padding: 20px;
+            padding: 14px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            min-height: 320px;
+            gap: 10px;
+            min-height: 280px;
         }
 
         .chart-card h3 {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-primary);
             text-transform: uppercase;
@@ -553,7 +635,6 @@
             height: 100%;
         }
 
-        /* Visão Tabela */
         .table-card {
             background-color: var(--bg-card);
             border-radius: var(--radius-md);
@@ -565,13 +646,13 @@
         }
 
         .table-actions-bar {
-            padding: 16px;
+            padding: 12px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 8px;
         }
 
         .table-container {
@@ -582,7 +663,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
             text-align: left;
         }
 
@@ -591,8 +672,8 @@
             color: var(--text-secondary);
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 11px;
-            padding: 12px 16px;
+            font-size: 10px;
+            padding: 10px 12px;
             border-bottom: 2px solid var(--border-color);
             cursor: pointer;
             user-select: none;
@@ -606,11 +687,11 @@
 
         th i {
             margin-left: 4px;
-            font-size: 10px;
+            font-size: 9px;
         }
 
         td {
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
             white-space: nowrap;
@@ -626,8 +707,8 @@
 
         .badge {
             display: inline-block;
-            padding: 4px 8px;
-            font-size: 11px;
+            padding: 3px 6px;
+            font-size: 10px;
             font-weight: 700;
             border-radius: 4px;
             text-transform: uppercase;
@@ -638,16 +719,16 @@
         .badge-baixa { background-color: var(--success-light); color: var(--success); }
 
         .pagination-bar {
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--bg-app);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         .pagination-controls {
@@ -655,7 +736,6 @@
             gap: 4px;
         }
 
-        /* Painel Lateral Drawer */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -697,7 +777,7 @@
         }
 
         .sidebar-header {
-            padding: 20px;
+            padding: 16px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
@@ -705,7 +785,7 @@
         }
 
         .sidebar-header h2 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -713,33 +793,33 @@
         .sidebar-close {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 18px;
             color: var(--text-secondary);
             cursor: pointer;
         }
 
         .sidebar-content {
-            padding: 20px;
+            padding: 16px;
             overflow-y: auto;
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
         .detail-category {
             background-color: var(--bg-app);
             border-radius: var(--radius-md);
-            padding: 14px;
+            padding: 12px;
             border: 1px solid var(--border-color);
         }
 
         .detail-category h3 {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 4px;
         }
@@ -747,23 +827,23 @@
         .detail-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
 
         .detail-item {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
 
         .detail-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--text-secondary);
         }
 
         .detail-value {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-primary);
             word-break: break-word;
@@ -774,10 +854,10 @@
             white-space: pre-wrap;
             font-weight: 500;
             background-color: var(--bg-card);
-            padding: 10px;
+            padding: 8px;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border-color);
-            max-height: 150px;
+            max-height: 120px;
             overflow-y: auto;
         }
 
@@ -795,12 +875,11 @@
         #fileInput { display: none; }
         table td a:hover { text-decoration: underline !important; }
 
-        /* Estilos do Botão Toggle Slider */
         .switch {
             position: relative;
             display: inline-block;
-            width: 40px;
-            height: 22px;
+            width: 34px;
+            height: 18px;
         }
         .switch input {
             opacity: 0;
@@ -813,12 +892,12 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--border-color);
             transition: .3s;
-            border-radius: 22px;
+            border-radius: 18px;
         }
         .slider:before {
             position: absolute;
             content: "";
-            height: 16px; width: 16px;
+            height: 12px; width: 12px;
             left: 3px; bottom: 3px;
             background-color: #ffffff;
             transition: .3s;
@@ -828,7 +907,7 @@
             background-color: var(--primary);
         }
         input:checked + .slider:before {
-            transform: translateX(18px);
+            transform: translateX(16px);
         }
 
         #verticalTrigger i {
@@ -841,20 +920,19 @@
             color: var(--primary);
         }
 
-        /* Painel Dropdown Flutuante */
         .multiselect-panel {
             display: none;
             position: absolute;
-            top: calc(100% + 6px);
+            top: calc(100% + 4px);
             left: 0;
             width: 100%;
-            max-height: 240px;
+            max-height: 200px;
             overflow-y: auto;
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 8px;
             z-index: 1000;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.3), 0 6px 8px -6px rgba(0, 0, 0, 0.3);
             padding: 4px;
             animation: dropdownEntrance 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             transform-origin: top;
@@ -865,29 +943,20 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        .multiselect-panel::-webkit-scrollbar {
-            width: 5px;
-        }
-        .multiselect-panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .multiselect-panel::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 10px;
-        }
-        .multiselect-panel::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
-        }
+        .multiselect-panel::-webkit-scrollbar { width: 5px; }
+        .multiselect-panel::-webkit-scrollbar-track { background: transparent; }
+        .multiselect-panel::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        .multiselect-panel::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
         .multiselect-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0 12px;
-            height: 42px;
-            border-radius: 8px;
+            gap: 10px;
+            padding: 0 10px;
+            height: 34px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             color: var(--text-primary);
             transition: all 0.18s ease;
@@ -910,8 +979,8 @@
         .multiselect-item::before {
             content: "";
             display: inline-block;
-            width: 18px;
-            height: 18px;
+            width: 14px;
+            height: 14px;
             border: 2px solid var(--text-secondary);
             border-radius: 50%;
             background-color: transparent;
@@ -919,28 +988,18 @@
             flex-shrink: 0;
         }
 
-        .multiselect-item:hover::before {
-            border-color: var(--primary);
-        }
-
-        .multiselect-item:has(input[type="checkbox"]:checked) {
-            color: var(--primary);
-            background-color: rgba(56, 189, 248, 0.08);
-        }
-
+        .multiselect-item:hover::before { border-color: var(--primary); }
+        .multiselect-item:has(input[type="checkbox"]:checked) { color: var(--primary); background-color: rgba(56, 189, 248, 0.08); }
         .multiselect-item:has(input[type="checkbox"]:checked)::before {
             border-color: var(--primary);
             background-color: var(--primary);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
-            background-size: 11px;
+            background-size: 9px;
             background-position: center;
             background-repeat: no-repeat;
             transform: scale(1.05);
         }
-
-        .multiselect-item:active::before {
-            transform: scale(0.9);
-        }
+        .multiselect-item:active::before { transform: scale(0.9); }
     </style>
 </head>
 <body class="dark-mode">
@@ -999,11 +1058,11 @@
             </div>
         </section>
 
-        <section class="filter-bar-container" style="background-color: var(--bg-card); border-radius: var(--radius-md); padding: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 16px;">
-            <div class="filter-main-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end;">
+        <section class="filter-bar-container" style="background-color: var(--bg-card); border-radius: var(--radius-md); padding: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px;">
+            <div class="filter-main-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; align-items: end;">
                 <div class="form-group search-group" style="grid-column: span 2;">
                     <label>Pesquisa por Texto</label>
-                    <input type="text" id="filterSearch" class="form-control" placeholder="Buscar por chamado, resumo, notas...">
+                    <input type="text" id="filterSearch" class="form-control" placeholder="Buscar por chamado, resumo...">
                 </div>
                 <div class="form-group">
                     <label>Responsável</label>
@@ -1013,25 +1072,36 @@
                     <label>Vertical</label>
                     <div class="form-control" id="verticalTrigger">
                         <span id="verticalText">Todos</span>
-                        <i class="fa-solid fa-chevron-down" style="font-size: 10px; opacity: 0.5;"></i>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 9px; opacity: 0.5;"></i>
                     </div>
                     <div class="multiselect-panel" id="verticalPanel"></div>
                 </div>
-                <div class="form-group" style="align-items: flex-start; justify-content: flex-end; min-height: 48px; width: max-content;">
-                    <label style="margin-bottom: 4px;">C/ Resp.</label>
+                <div class="form-group">
+                    <label>Previsão Limite Sprint</label>
+                    <input type="date" id="filterSprintDate" class="form-control" style="padding: 0 4px !important;">
+                </div>
+                <div class="form-group" style="align-items: flex-start; justify-content: flex-end; min-height: 38px; width: max-content;">
+                    <label style="margin-bottom: 2px;">Sprint Atual</label>
                     <label class="switch">
-                        <input type="checkbox" id="filterWithResponsible" checked>
+                        <input type="checkbox" id="filterSprintAtual">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="form-group" style="align-items: flex-start; justify-content: flex-end; min-height: 38px; width: max-content;">
+                    <label style="margin-bottom: 2px;">Backlog</label>
+                    <label class="switch">
+                        <input type="checkbox" id="filterBacklogOnly">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="form-group" style="justify-content: flex-end;">
-                    <button class="btn" id="toggleAdvancedFilters" style="width: 100%; justify-content: center; background-color: var(--primary-light); color: var(--primary); border-color: transparent;">
+                    <button class="btn" id="toggleAdvancedFilters" style="width: 100%; justify-content: center; background-color: var(--primary-light); color: var(--primary); border-color: transparent; height: 32px;">
                         <i class="fa-solid fa-sliders"></i> Avançado
                     </button>
                 </div>
             </div>
 
-            <div id="advancedFiltersRow" style="display: none; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; border-top: 1px dashed var(--border-color); padding-top: 16px; animation: fadeIn 0.25s ease-out;">
+            <div id="advancedFiltersRow" style="display: none; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; border-top: 1px dashed var(--border-color); padding-top: 12px; animation: fadeIn 0.25s ease-out;">
                 <div class="form-group">
                     <label>Município</label>
                     <select id="filterClient" class="form-control"><option value="">Todos</option></select>
@@ -1105,8 +1175,8 @@
         <div id="tab-table" class="tab-content">
             <div class="table-card">
                 <div class="table-actions-bar">
-                    <div style="font-weight: 600; font-size: 14px;">Registros Filtrados: <span id="tableCount">0</span></div>
-                    <div style="display: flex; gap: 8px;">
+                    <div style="font-weight: 600; font-size: 13px;">Registros Filtrados: <span id="tableCount">0</span></div>
+                    <div style="display: flex; gap: 6px;">
                         <button class="btn" onclick="exportTable('copy')"><i class="fa-solid fa-copy"></i> Copiar Dados</button>
                         <button class="btn" onclick="exportTable('csv')"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
                         <button class="btn" onclick="exportTable('excel')"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
@@ -1123,7 +1193,7 @@
                 <div class="pagination-bar">
                     <div>
                         Exibindo de <span id="pagStart">0</span> a <span id="pagEnd">0</span> de <span id="pagTotal">0</span> registros.
-                        <select id="pagLength" class="form-control" style="width: auto; display: inline-block; margin-left: 10px; padding: 4px 8px;">
+                        <select id="pagLength" class="form-control" style="width: auto; display: inline-block; margin-left: 8px; padding: 2px 6px; height: 26px; line-height: 24px;">
                             <option value="10">10 por página</option>
                             <option value="25" selected>25 por página</option>
                             <option value="50">50 por página</option>
@@ -1131,8 +1201,8 @@
                         </select>
                     </div>
                     <div class="pagination-controls">
-                        <button class="btn" id="btnPrevPage" style="padding: 4px 10px;"><i class="fa-solid fa-chevron-left"></i> Anteriores</button>
-                        <button class="btn" id="btnNextPage" style="padding: 4px 10px;">Próximas <i class="fa-solid fa-chevron-right"></i></button>
+                        <button class="btn" id="btnPrevPage" style="padding: 2px 8px;"><i class="fa-solid fa-chevron-left"></i> Anteriores</button>
+                        <button class="btn" id="btnNextPage" style="padding: 2px 8px;">Próximas <i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                 </div>
             </div>
@@ -1160,7 +1230,6 @@
         let currentSortColumn = '';
         let currentSortDirection = 'asc';
 
-        // Lista permitida oficial em caixa alta
         const allowedParticipants = new Set([
             "ADEMILSON ALEXANDRE", "ADIEL MATHIAS SILVESTRE", "ADILSON VITOR KREUSH FILHO",
             "ALEX ROSSANO PRESTES DA SILVA", "ANA AMARA FARIAS BARBOSA", "BRENO JESUS MATHEUS DE OLIVEIRA",
@@ -1196,10 +1265,8 @@
             tipo: ['tipo', 'type', 'tipo do chamado', 'tipo de chamado', 'issue type', 'tipo de ticket']
         };
 
-        // Função utilitária para extrair e limpar todos os nomes de uma string de responsáveis/participantes
         const extractAndCleanNames = (rawString) => {
             if (!rawString) return [];
-            // Quebra por vírgula ou por quebra de linha
             let rawTokens = rawString.toString().split(/[\n\r,]+/);
             let validNames = [];
             
@@ -1228,26 +1295,33 @@
 
         const isStatusConcluido = (statusStr) => {
             const s = (statusStr || '').toString().toLowerCase().trim();
-            return s === 'concluído' || s === 'concluido' || s === 'finalizado' || s === 'fechado' || s === 'encerrado';
+            return s === 'concluído' || s === 'concluido' || s === 'finalizado' || s === 'fechado' || s === 'encerrado' || s === 'resolvido' || s === 'concluída' || s === 'conclua' || s === 'concluida' || s === 'cancelada';
         };
 
         const getStatusStyle = (statusStr) => {
             const s = (statusStr || '').toString().toLowerCase().trim();
             
-            if (s === 'fechado' || s === 'concluído' || s === 'concluido') {
-                return { bg: 'var(--success-light)', text: 'var(--success)', border: 'var(--success)' };
+            if (['fechado', 'concluído', 'concluido', 'finalizado', 'encerrado', 'resolvido', 'concluída', 'concluida', 'cancelada'].includes(s)) {
+                return { bg: 'var(--success-light)', text: 'var(--success)', border: 'var(--success)', badgeClass: 'badge-doing' };
             }
             if (['aguardando solicitante', 'aguardando informações (planejamento)', 'aguardando informacoes (planejamento)', 'aguardando dependência', 'aguardando dependencia', 'produto', 'aguardando revenda', 'aguardando aprovação', 'aguardando aprovacao', 'aguardando negociação', 'aguardando negociacao'].includes(s)) {
-                return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
+                return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)', badgeClass: 'badge-doing' };
             }
             if (['aguardando planejamento', 'em planejamento', 'aguardando atendimento (fl)', 'aguardando atendimento', 'não iniciada', 'nao iniciada'].includes(s)) {
-                return { bg: 'var(--kanban-column-bg)', text: 'var(--text-secondary)', border: 'var(--text-secondary)' };
+                return { bg: 'var(--border-color)', text: 'var(--text-secondary)', border: 'var(--text-secondary)', badgeClass: 'badge-todo' };
             }
-            if (['em atendimento', 'em atendimento (fl)', 'em atendimento n2 (sup)', 'em atendimento n2', 'em andamento'].includes(s)) {
-                return { bg: 'var(--warning-light)', text: 'var(--warning)', border: 'var(--warning)' };
+            if (['em atendimento', 'em atendimento (fl)', 'em atendimento n2 (sup', 'em atendimento n2', 'em andamento',
+                 'aguardando implantação', 'aguardando implantacao', 'entendendo o escopo', 'aguardando saneamento', 'realizando saneamento',
+                 'aguardando migração de homologação', 'aguardando migracao de homologacao', 'em migração de homologação', 'em migracao de homologacao',
+                 'aguardando homologação da migração', 'aguardando homologacao da migracao', 'em homologação da migração', 'em homologacao da migracao',
+                 'aguardando bugs', 'aguardando configuração', 'aguardando configuracao', 'realizando configuração', 'realizando configuracao',
+                 'aguardando treinamento', 'realizando treinamento', 'em homologação pelo cliente', 'em homologacao pelo cliente',
+                 'aguardando base para virada', 'aguardando migração de produção', 'aguardando migracao de producao', 'em migração de produção', 'em migracao de producao',
+                 'em acompanhamento'].includes(s)) {
+                return { bg: 'var(--warning-light)', text: 'var(--warning)', border: 'var(--warning)', badgeClass: 'badge-doing' };
             }
 
-            return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)' };
+            return { bg: 'var(--primary-light)', text: 'var(--primary)', border: 'var(--primary)', badgeClass: 'badge-doing' };
         };
 
         const parseSafeDate = (val) => {
@@ -1283,6 +1357,41 @@
             if (!isNaN(n) && n > 20000) return new Date((n - 25569) * 86400 * 1000);
             let parsed = new Date(str);
             return isNaN(parsed.getTime()) ? new Date(0) : parsed;
+        };
+
+        const isValidDate = (val) => {
+            if (!val) return false;
+            const date = parseSafeDate(val);
+            return date && !isNaN(date.getTime()) && date.getTime() !== 0;
+        };
+
+        const formatDateTimeExact = (val) => {
+            if (!val) return '-';
+            const date = parseSafeDate(val);
+            if (!date || isNaN(date.getTime()) || date.getTime() === 0) return val.toString();
+            const day = String(date.getDate()).padStart(2, '0');
+            const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            const month = months[date.getMonth()];
+            const year = String(date.getFullYear()).slice(-2);
+            
+            let hours = date.getHours();
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            
+            return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+        };
+
+        const formatDateOnlyExact = (val) => {
+            if (!val) return '-';
+            const date = parseSafeDate(val);
+            if (!date || isNaN(date.getTime()) || date.getTime() === 0) return val.toString();
+            const day = String(date.getDate()).padStart(2, '0');
+            const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            const month = months[date.getMonth()];
+            const year = String(date.getFullYear()).slice(-2);
+            return `${day}/${month}/${year}`;
         };
 
         const getMappedValue = (row, fieldKey) => {
@@ -1353,7 +1462,9 @@
             const filters = ['filterSearch', 'filterClient', 'filterResponsible', 'filterStatus', 'filterPriority', 'filterProduct', 'filterUF', 'filterType'];
             filters.forEach(id => document.getElementById(id).addEventListener('input', applyFiltersAndRefresh));
             
-            document.getElementById('filterWithResponsible').addEventListener('change', applyFiltersAndRefresh);
+            document.getElementById('filterBacklogOnly').addEventListener('change', applyFiltersAndRefresh);
+            document.getElementById('filterSprintDate').addEventListener('change', applyFiltersAndRefresh);
+            document.getElementById('filterSprintAtual').addEventListener('change', applyFiltersAndRefresh);
 
             document.getElementById('pagLength').addEventListener('change', (e) => { rowsPerPage = parseInt(e.target.value); currentPage = 1; renderTable(); });
             document.getElementById('btnPrevPage').addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
@@ -1573,14 +1684,44 @@
             const prodVal = document.getElementById('filterProduct').value.toUpperCase();
             const ufVal = document.getElementById('filterUF').value.toUpperCase();
             const typeVal = document.getElementById('filterType').value.toUpperCase();
-            const withRespOnly = document.getElementById('filterWithResponsible').checked;
+            const backlogOnly = document.getElementById('filterBacklogOnly').checked;
             
+            const sprintAtualActive = document.getElementById('filterSprintAtual').checked;
+            const sprintDateVal = document.getElementById('filterSprintDate').value;
+
             const checkboxes = document.querySelectorAll('#verticalPanel input[type="checkbox"]');
             const selectedVerticals = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value.toUpperCase());
 
             filteredDataGlobal = rawDataGlobal.filter(row => {
                 let currentResp = getMappedValue(row, 'responsavel');
-                if (withRespOnly && isSemResponsavel(currentResp)) return false;
+                let currentStatus = getMappedValue(row, 'status');
+
+                if (sprintAtualActive) {
+                    if (isSemResponsavel(currentResp)) return false;
+                    if (!sprintDateVal) return false;
+
+                    let dataChamadoRaw = isStatusConcluido(currentStatus)
+                        ? (getMappedValue(row, 'data_conclusao') || getMappedValue(row, 'previsao_solucao'))
+                        : getMappedValue(row, 'previsao_solucao');
+
+                    let ticketDate = parseSafeDate(dataChamadoRaw);
+                    if (!ticketDate || ticketDate.getTime() === 0 || isNaN(ticketDate.getTime())) return false;
+
+                    let parts = sprintDateVal.split('-');
+                    let dLimit = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    dLimit.setHours(0,0,0,0);
+
+                    let dTicket = new Date(ticketDate);
+                    dTicket.setHours(0,0,0,0);
+
+                    if (dTicket > dLimit) return false;
+                }
+
+                if (backlogOnly) {
+                    const semResp = isSemResponsavel(currentResp);
+                    const concluido = isStatusConcluido(currentStatus) || !!getMappedValue(row, 'data_conclusao');
+                    if (!semResp || concluido) return false;
+                }
 
                 if (searchText) {
                     let matchText = Object.values(row).some(v => v && v.toString().toLowerCase().includes(searchText));
@@ -1666,25 +1807,41 @@
             window.requestAnimationFrame(step);
         }
 
+        /* -------------------------------------------------------------------------
+           MÓDULO: RENDER KANBAN (ATUALIZADO COM SISTEMA DE ALERTAS ESPECÍFICOS)
+        ------------------------------------------------------------------------- */
         const renderKanban = () => {
             const board = document.getElementById('kanbanBoard'); board.innerHTML = '';
-            const withRespOnly = document.getElementById('filterWithResponsible').checked;
+            const backlogOnly = document.getElementById('filterBacklogOnly').checked;
+            const sprintAtualActive = document.getElementById('filterSprintAtual').checked;
             
-            const targetColumns = withRespOnly 
-                ? ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"]
-                : ["Backlog"];
+            let targetColumns;
+            if (backlogOnly) {
+                targetColumns = ["Backlog"];
+            } else if (sprintAtualActive) {
+                targetColumns = ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
+            } else {
+                targetColumns = ["Backlog", "To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
+            }
             
             const getColumnForStatus = (statusStr) => {
                 const s = (statusStr || '').toString().trim().toLowerCase();
                 
-                if (['não iniciada', 'nao iniciada', 'aguardando planejamento', 'em planejamento', 'aguardando atendimento (fl)', 'aguardando atendimento'].includes(s)) {
-                    return 'To do';
+                if (['fechado', 'concluído', 'concluido', 'finalizado', 'encerrado', 'resolvido', 'concluída', 'concluida', 'cancelada'].includes(s)) {
+                    return 'Done';
                 }
-                if (['em atendimento (fl)', 'em atendimento', 'em atendimento n2 (sup)', 'em atendimento n2', 'em andamento'].includes(s)) {
+                if (['em atendimento (fl)', 'em atendimento', 'em atendimento n2 (sup)', 'em atendimento n2', 'em andamento',
+                     'aguardando implantação', 'aguardando implantacao', 'entendendo o escopo', 'aguardando saneamento', 'realizando saneamento',
+                     'aguardando migração de homologação', 'aguardando migracao de homologacao', 'em migração de homologação', 'em migracao de homologacao',
+                     'aguardando homologação da migração', 'aguardando homologacao da migracao', 'em homologação da migração', 'em homologacao da migracao',
+                     'aguardando bugs', 'aguardando configuração', 'aguardando configuracao', 'realizando configuração', 'realizando configuracao',
+                     'aguardando treinamento', 'realizando treinamento', 'em homologação pelo cliente', 'em homologacao pelo cliente',
+                     'aguardando base para virada', 'aguardando migração de produção', 'aguardando migracao de producao', 'em migração de produção', 'em migracao de producao',
+                     'em acompanhamento'].includes(s)) {
                     return 'Doing';
                 }
-                if (['fechado', 'concluído', 'concluido', 'finalizado', 'encerrado'].includes(s)) {
-                    return 'Done';
+                if (['não iniciada', 'nao iniciada', 'aguardando planejamento', 'em planejamento', 'aguardando atendimento (fl)', 'aguardando atendimento', 'aguardando implantação', 'aguardando implantacao'].includes(s)) {
+                    return 'To do';
                 }
                 if (['aguardando informações (planejamento)', 'aguardando informacoes (planejamento)', 'aguardando solicitante', 'aguardando revenda', 'aguardando aprovação', 'aguardando aprovacao', 'aguardando negociação', 'aguardando negociacao'].includes(s)) {
                     return 'Aguardando solicitante';
@@ -1726,7 +1883,7 @@
                 const colElement = document.createElement('div');
                 colElement.className = 'kanban-column';
                 colElement.innerHTML = `
-                    <div class="kanban-column-header" style="border-top: 4px solid ${style.border};">
+                    <div class="kanban-column-header" style="border-top: 3px solid ${style.border};">
                         <span class="kanban-column-title">${colName}</span>
                         <span class="kanban-card-count" style="background-color: ${style.bg}; color: ${style.text};">${colCardsData.length}</span>
                     </div>
@@ -1737,69 +1894,125 @@
 
                 colCardsData.forEach(row => {
                     const id = getMappedValue(row, 'id') || '#ID';
-                    const municipio = getMappedValue(row, 'cliente') || 'Não Informado';
-                    const sistema = getMappedValue(row, 'produto') || 'Não Informado';
-                    const tipoChamado = (getMappedValue(row, 'tipo') || '').toString().trim().toLowerCase();
-                    const resume = getMappedValue(row, 'resumo') || 'Sem resumo.';
-                    
-                    let responsavelRaw = getMappedValue(row, 'responsavel') || 'Não Atribuído';
-                    let responsavelClean = extractAndCleanNames(responsavelRaw).join(', ');
-
-                    const prioridade = (getMappedValue(row, 'prioridade') || 'Baixa').toString().trim();
+                    const municipio = (getMappedValue(row, 'cliente') || 'Não Informado').toString().trim();
+                    const sistemaText = (getMappedValue(row, 'produto') || 'Não Informado').toString().trim();
+                    const resumoText = (getMappedValue(row, 'resumo') || '-').toString().trim();
                     const dias = parseInt(getMappedValue(row, 'dias_aberto')) || 0;
                     
                     let rD = getMappedValue(row, 'data_abertura');
-                    let dOpen = rD instanceof Date ? rD.toLocaleDateString('pt-BR') : (rD || '-');
+                    let dOpenOnlyDate = formatDateOnlyExact(rD);
 
                     let rP = getMappedValue(row, 'previsao_solucao');
                     let rC = getMappedValue(row, 'data_conclusao');
                     
-                    let dPrev = rP instanceof Date ? rP.toLocaleDateString('pt-BR') : (rP || '');
-                    let dConcl = rC instanceof Date ? rC.toLocaleDateString('pt-BR') : (rC || '');
-                    
-                    let footerDateHtml = '';
-                    if (colName === 'Done') {
-                        footerDateHtml = `<div style="font-size: 11px; margin-top: 4px; color: var(--success); display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-calendar-check" style="opacity: 0.7;"></i> Concluído em: <span style="font-weight: 600;">${dConcl || dOpen}</span></div>`;
-                    } else if (dPrev) {
-                        let iconeVencido = '';
-                        const dataPrevista = parseSafeDate(rP);
-                        const hoje = new Date();
-                        hoje.setHours(0,0,0,0);
-                        if (dataPrevista && dataPrevista.getTime() !== 0 && dataPrevista < hoje) {
-                            iconeVencido = '⛔ ';
+                    // Validação de Prazos Vencidos (Alerta Vermelho)
+                    const hasForecastDate = isValidDate(rP);
+                    let isOverdue = false;
+                    if (colName !== 'Done' && hasForecastDate) {
+                        const forecastDate = parseSafeDate(rP);
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
+                        if (forecastDate && forecastDate.getTime() !== 0 && forecastDate < today) {
+                            isOverdue = true;
                         }
-                        footerDateHtml = `<div style="font-size: 11px; margin-top: 4px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;"><i class="fa-regular fa-calendar-check" style="opacity: 0.7;"></i> Prev: <span style="font-weight: 600; color: var(--text-primary);">${iconeVencido}${dPrev}</span></div>`;
                     }
 
-                    let prioClass = prioridade.toLowerCase() === 'alta' ? 'prio-alta' : (prioridade.toLowerCase().includes('med') ? 'prio-media' : 'prio-baixa');
-                    let isAtrasado = (colName !== 'Done' && dias > 30);
-
-                    let alertaFaltaPrevisaoHtml = '';
-                    if (colName !== 'Done' && !isSemResponsavel(responsavelRaw) && !dPrev) {
-                        alertaFaltaPrevisaoHtml = `<i class="fa-solid fa-triangle-exclamation" style="color: var(--warning); margin-left: 6px;" title="Alerta: Ticket com responsável atribuído, mas sem previsão de solução!"></i>`;
+                    // Validação de Alerta Amarelo: colunas Doing e Aguardando solicitante sem previsão de fechamento (data nula, vazia ou inválida)
+                    let isMissingForecast = false;
+                    if (!hasForecastDate && (colName === 'Doing' || colName === 'Aguardando solicitante')) {
+                        isMissingForecast = true;
                     }
 
-                    let tagImplantacaoHtml = '';
-                    if (tipoChamado === 'implantação' || tipoChamado === 'implantacao') {
-                        tagImplantacaoHtml = `<div class="card-client" style="background: var(--success-light); color: var(--success); border: 1px solid var(--success);"><i class="fa-solid fa-rocket" style="font-size:10px; margin-right:4px;"></i>IMPLANTAÇÃO</div>`;
+                    // Montagem dinâmica estrutural da linha de SLA/Prazo
+                    let labelPrazo = 'Previsão';
+                    let valPrazo = rP;
+                    
+                    if (colName === 'Done') {
+                        labelPrazo = 'Concluído em';
+                        valPrazo = rC || rP || rD;
+                    } else if (!hasForecastDate) {
+                        labelPrazo = 'Abertura';
+                        valPrazo = rD;
+                    }
+                    
+                    // Formatação do texto do prazo e injeção do ícone textual conforme o caso
+                    let alertIconHtml = '';
+                    let campoPrazoTexto = '';
+                    
+                    if (isMissingForecast) {
+                        campoPrazoTexto = `Previsão: ⚠️`;
+                    } else {
+                        if (isOverdue) {
+                            alertIconHtml = `<i class="fa-solid fa-circle-exclamation" style="color: #ef4444; margin-right: 5px;" title="Previsão de Fechamento Vencida"></i>`;
+                        }
+                        campoPrazoTexto = `${labelPrazo}: ${colName === 'Done' ? formatDateOnlyExact(valPrazo) : formatDateTimeExact(valPrazo)}`;
                     }
 
-                    const idHtml = id !== '#ID' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" class="card-id" style="text-decoration: none; color: var(--primary);" onclick="event.stopPropagation();">${id}</a>` : `<span>${id}</span>`;
+                    // Definição das classes de status de SLA (Verde APENAS para concluídos)
+                    let statusSlaClass = 'neutral';
+                    if (colName === 'Done') {
+                        statusSlaClass = 'ok'; // Verde
+                    } else if (isOverdue) {
+                        statusSlaClass = 'danger'; // Vermelho
+                    } else if (isMissingForecast) {
+                        statusSlaClass = 'warn'; // Amarelo
+                    }
 
-                    const cardElement = document.createElement('div');
-                    cardElement.className = `kanban-card ${prioClass} ${isAtrasado ? 'card-atrasado' : ''}`;
+                    let responsavelRaw = getMappedValue(row, 'responsavel') || 'Não Atribuído';
+                    let names = extractAndCleanNames(responsavelRaw);
+                    let formattedNames = names.map(name => {
+                        let parts = name.trim().split(/\s+/);
+                        if (parts.length <= 2) return name;
+                        return `${parts[0]} ${parts[parts.length - 1]}`;
+                    });
+                    let responsavelClean = formattedNames.join(', ') || 'Não Atribuído';
+
+                    const idHtml = id !== '#ID' ? `<a href="https://atendimento.betha.com.br/browse/${id}" target="_blank" class="card-id" onclick="event.stopPropagation();">${id}</a>` : `<span>${id}</span>`;
+
+                    const cardElement = document.createElement('article');
+                    cardElement.className = `kanban-card`;
+                    cardElement.setAttribute('role', 'button');
+                    cardElement.setAttribute('tabindex', '0');
                     cardElement.innerHTML = `
-                        <div class="card-header-row"><div>${idHtml}${alertaFaltaPrevisaoHtml}</div><span>${dOpen}</span></div>
-                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                            <div class="card-client"><i class="fa-solid fa-location-dot" style="font-size:10px; margin-right:4px; opacity:0.6;"></i>${municipio.toUpperCase()}</div>
-                            <div class="card-client" style="background: var(--primary-light); color: var(--primary);"><i class="fa-solid fa-laptop-code" style="font-size:10px; margin-right:4px; opacity:0.6;"></i>${sistema.toUpperCase()}</div>
-                            ${tagImplantacaoHtml}
+                        <div class="card-row-top">
+                            ${idHtml}
+                            <span class="card-time">${dOpenOnlyDate}</span>
                         </div>
-                        <div class="card-summary" style="margin-top: 4px;">${resume.substring(0, 75)}${resume.length > 75 ? '...' : ''}</div>
-                        ${footerDateHtml}
-                        <div class="card-footer-row"><span class="card-responsible" title="${responsavelClean}"><i class="fa-regular fa-user"></i> ${responsavelClean}</span><span class="card-days ${dias>30?'danger':(dias>15?'warn':'ok')}">${dias}d</span></div>
+
+                        <div class="card-pill-municipio" title="${municipio.toUpperCase()} - ${sistemaText.toUpperCase()}">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>${municipio.toUpperCase()} - ${sistemaText.toUpperCase()}</span>
+                        </div>
+
+                        <div class="card-summary" title="${resumoText}">
+                            ${resumoText}
+                        </div>
+
+                        <div class="card-date-limit ${statusSlaClass}">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <span>${alertIconHtml}${campoPrazoTexto}</span>
+                        </div>
+
+                        <hr class="card-divider" />
+
+                        <div class="card-footer">
+                            <div class="card-resp-area" title="${responsavelClean}">
+                                <i class="fa-regular fa-user"></i>
+                                <span>${responsavelClean}</span>
+                            </div>
+                            <div class="card-age-badge ${statusSlaClass}">
+                                <span>${dias}d</span>
+                            </div>
+                        </div>
                     `;
+
                     cardElement.addEventListener('click', () => openSidebarDetails(row));
+                    cardElement.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            openSidebarDetails(row);
+                        }
+                    });
                     cardsContainer.appendChild(cardElement);
                 });
             });
@@ -1808,8 +2021,9 @@
         const renderCharts = () => {
             Object.values(chartInstances).forEach(c => { if(c) c.destroy(); });
             const isDark = document.body.classList.contains('dark-mode');
-            const txtColor = isDark ? '#94a3b8' : '#5e6c84', gridColor = isDark ? '#334155' : '#dfe1e6';
-            const palette = ['rgba(0,82,204,0.75)', 'rgba(54,179,126,0.75)', 'rgba(255,171,0,0.75)', 'rgba(255,86,48,0.75)', 'rgba(101,84,192,0.75)', 'rgba(0,184,217,0.75)'];
+            const txtColor = isDark ? '#a2b4c7' : '#5e6c84', gridColor = isDark ? '#1d2d44' : '#dfe1e6';
+            
+            const palette = ['#00a8ff', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#00b4d8'];
 
             const optFactory = (indexAxis='x') => ({
                 responsive:true, maintainAspectRatio:false, indexAxis:indexAxis,
@@ -1837,10 +2051,10 @@
 
             let dtC = {}; filteredDataGlobal.forEach(r => { let raw = getMappedValue(r, 'data_abertura'); let k = raw instanceof Date ? raw.toLocaleDateString('pt-BR') : (raw || 'Sem Data').toString().trim(); dtC[k] = (dtC[k]||0)+1; });
             let sDates = Object.keys(dtC).sort((a,b)=>parseSafeDate(a)-parseSafeDate(b));
-            chartInstances['date'] = new Chart(document.getElementById('chartDate'), { type:'line', data:{ labels:sDates, datasets:[{ data:sDates.map(k=>dtC[k]), borderColor:'rgba(0,184,217,1)', tension:0.2, fill:true, backgroundColor:'rgba(0,184,217,0.1)' }] }, options:optFactory('x') });
+            chartInstances['date'] = new Chart(document.getElementById('chartDate'), { type:'line', data:{ labels:sDates, datasets:[{ data:sDates.map(k=>dtC[k]), borderColor:'rgba(0,168,255,1)', tension:0.2, fill:true, backgroundColor:'rgba(0,168,255,0.08)' }] }, options:optFactory('x') });
 
             let pcC = {}; filteredDataGlobal.forEach(r => { let v = getMappedValue(r, 'prioridade') || 'Baixa'; v = v.toUpperCase(); pcC[v] = (pcC[v]||0)+1; });
-            chartInstances['priority'] = new Chart(document.getElementById('chartPriority'), { type:'pie', data:{ labels:Object.keys(pcC), datasets:[{ data:Object.values(pcC), backgroundColor:['#ff5630','#ffab00','#36b37e'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, position:'left', labels:{ color:txtColor } } } } });
+            chartInstances['priority'] = new Chart(document.getElementById('chartPriority'), { type:'pie', data:{ labels:Object.keys(pcC), datasets:[{ data:Object.values(pcC), backgroundColor:['#ef4444','#f59e0b','#10b981'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, position:'left', labels:{ color:txtColor } } } } });
 
             let tmR = {}; filteredDataGlobal.forEach(r => {
                 let rawResp = getMappedValue(r, 'responsavel') || 'Não Atribuído';
@@ -1855,7 +2069,7 @@
                 }
             });
             let labelsA = [], valuesA = []; Object.entries(tmR).forEach(([n,o])=>{ labelsA.push(n); valuesA.push(Math.round(o.t/o.c)||0); });
-            chartInstances['avgTimeResp'] = new Chart(document.getElementById('chartAvgTimeResp'), { type:'bar', data:{ labels:labelsA, datasets:[{ data:valuesA, backgroundColor:'rgba(255,137,0,0.75)' }] }, options:optFactory('x') });
+            chartInstances['avgTimeResp'] = new Chart(document.getElementById('chartAvgTimeResp'), { type:'bar', data:{ labels:labelsA, datasets:[{ data:valuesA, backgroundColor:'rgba(245,158,11,0.75)' }] }, options:optFactory('x') });
         };
 
         const renderTableStructure = () => {
