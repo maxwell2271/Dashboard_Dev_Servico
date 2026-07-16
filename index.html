@@ -1818,10 +1818,8 @@
             let targetColumns;
             if (backlogOnly) {
                 targetColumns = ["Backlog"];
-            } else if (sprintAtualActive) {
-                targetColumns = ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
             } else {
-                targetColumns = ["Backlog", "To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
+                targetColumns = ["To do", "Doing", "Done", "Aguardando solicitante", "Aguardando dependência"];
             }
             
             const getColumnForStatus = (statusStr) => {
